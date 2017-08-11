@@ -1,0 +1,78 @@
+- name: Create BIG-IP VMware guest
+  hosts: localhost
+  connection: local
+
+  tasks:
+
+  #Define the environment variables for GOVC. Give the name of the guest to spin up and also the image to use
+  #The image should be present locally on the machine from where you are running the ansible playbooks
+  #If image is not present in vCenter, it will upload it, if it is already present it will skip this step and move to spinning up the VM
+  - name: Import OVA
+    command: "/usr/local/bin/govc import.ova -name=newVM-BIGIP001 /root/BIGIP-12.1.2.0.0.249.LTM-scsi.ova"
+    environment:
+     GOVC_HOST: "10.192.73.XXX"
+     GOVC_URL: "https://10.192.73.XXX/sdk"
+     GOVC_USERNAME: "root"
+     GOVC_PASSWORD: "XXXX"
+     GOVC_INSECURE: "1"
+     GOVC_DATACENTER: "F5 BD Lab"
+     GOVC_DATASTORE: "datastore1 (5)"
+     GOVC_RESOURCE_POOL: "Testing"
+    register: command_result
+
+  #Once the VM is deployed power on the VM
+  - name: Power on VM
+    command: "/usr/local/bin/govc vm.power -on newVM-BIGIP001"
+    environment:
+     GOVC_HOST: "10.192.73.XXX"
+     GOVC_URL: "https://10.192.73.XXX/sdk"
+     GOVC_USERNAME: "root"
+     GOVC_PASSWORD: "XXXX"
+     GOVC_INSECURE: "1"
+     GOVC_DATACENTER: "F5 BD Lab"
+     GOVC_DATASTORE: "datastore1 (5)"
+     GOVC_RESOURCE_POOL: "Testing"
+    register: command_result
+
+  #Wait for about 5 minutes for BIG-IP to boot up and get an IP address through DHCP
+  - wait_for:
+      timeout: 300
+
+  #Get the VM information
+  - name: Check for VM info
+    command: "/usr/local/bin/govc vm.info newVM-BIGIP001"
+    environment:
+     GOVC_HOST: "10.192.73.XXX"
+     GOVC_URL: "https://10.192.73.XXX/sdk"
+     GOVC_USERNAME: "root"
+     GOVC_PASSWORD: "XXXX"
+     GOVC_INSECURE: "1"
+     GOVC_DATACENTER: "F5 BD Lab"
+    register: govc_vm_info
+
+  - debug: msg="{{ govc_vm_info["stdout"]}}"
+
+  #Copy VM output info to a file, manupilate the contents to be able to get the IP address
+  - copy:
+     content: "{{govc_vm_info['stdout']}}"
+     dest: "/path_to_file/govc_var_file.yaml"
+     mode: 0644
+
+  - replace:
+     path: "/path_to_file/govc_var_file.yaml"
+     regexp: '(.)IP address(.*)'
+     replace: '\1IPaddress\2'
+
+  - replace:
+     path: "/path_to_file/govc_var_file.yaml"
+     regexp: '  ([A-Z].*)'
+     replace: '\1'
+
+  #This file will have the VM information stored
+  - name: Include vars
+    include_vars: govc_var_file.yaml
+
+  #Get the IP address assigned to the VM and then use it furthur to configure the BIG-IP. 
+  #Or use it in other playbooks
+  - name: Print IPAddress
+    debug: msg="IP Address of BIG-IP is -  {{IPaddress}}"
