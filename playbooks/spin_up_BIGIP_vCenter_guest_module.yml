@@ -1,0 +1,38 @@
+---
+- name: Create BIG-IP guest in VMware
+  hosts: localhost
+  connection: local
+  become: true
+
+  vars:
+   guest_name: "newVM-BIGIP001"
+
+  tasks:
+  #Deploy a BIG-IP in vCenter using the vsphere_guest ansible module
+  #A BIG-IP VE template must pre-exist. Using the template a BIG-IP VE is spun up
+  #This step will power on the VM as well
+  - name: Deploy BIG-IP VE in vCenter
+    vsphere_guest:
+      vcenter_hostname: 10.192.XX.XXX
+      esxi:
+        datacenter: F5 BD Lab
+        hostname: 10.192.XX.XXX
+      username: root
+      password: XXXXX
+      guest: "{{ guest_name }}"
+      from_template: yes
+      #Template already exists in vCenter 
+      template_src: "BIG-IP VE 12.1.2.0.0.249-Template"
+
+  - name: Check VM deployed
+    vsphere_guest:
+      vcenter_hostname: 10.192.XX.XXX
+      username: root
+      password: vmware
+      guest: "{{ guest_name }}"
+      vmware_guest_facts: yes
+    delegate_to: localhost
+    register: vmguest_facts
+
+  - name: Debug facts
+    debug: msg="vmguest facts are {{ vmguest_facts }}"
