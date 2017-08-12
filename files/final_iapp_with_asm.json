@@ -1,3 +1,7 @@
+#This JSON blob will create a virtual server and attach a pool to it with 5 pool members.The pool has the http montior assigned to it 
+#It will attach 3 iRules to the Virtual Server. (iRules are existing on the BIG-IP).
+#It will also attach a ASM profile to the Virtual Server. (ASM profile exists on the BIG-IP).
+
 {
 	"tables": [{
 			"name": "feature__easyL4FirewallBlacklist",
