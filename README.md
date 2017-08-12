@@ -4,6 +4,7 @@ Ansible playbooks using BIG-IP ansible modules
 Workflows
 ---------
 - HA: Playbook to create a BIG-IP HA pair using the bigip_command module - "create-ha-plyabook.yaml"
+- iApp: Playbook to upload the iApp to the BIG-IP and then deploy the iApp -"upload_and_deploy_iapp.yml"
 
 Private Cloud
 -------------
