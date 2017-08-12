@@ -1,0 +1,33 @@
+- name: Launch BIG-IP CFT in AWS
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+  #Launch a BIG-IP CFT in AWS. The template for th CFT has to be present.
+  #Get more information about the BIG-IP CFT's templates supported - https://github.com/F5Networks/f5-aws-cloudformation
+  #Template paramteres will depend on the template
+  - name: Launch BIG-IP CFT
+    cloudformation:
+     aws_access_key: "XXXXXXXXXXXXXXXXX"
+     aws_secret_key: "XXXXXXXXXXXXXXXXXXXXXXXXX"
+     stack_name: "Stack-StandaloneBIGIP-1nic-experimental"
+     state: "present"
+     region: "us-west-2"
+     disable_rollback: true
+     template: "standalone-hourly-1nic-experimental.json"
+     template_parameters:
+      availabilityZone1: "us-west-2a"
+      sshKey: "bigip-test"
+     validate_certs : false
+
+  - name: Get facts from the deployed cloud formation stack
+    cloudformation_facts:
+     aws_access_key: "XXXXXXXXXXXXXXXXX"
+     aws_secret_key: "XXXXXXXXXXXXXXXXXXXXXXXXX"
+     region: "us-west-2"
+     stack_name: "Stack-StandaloneBIGIP-1nic-experimental"
+    register: bigip_ip_address
+
+  #Get the BIG-IP ipaddress and use it furthur to configure the BIG-IP
+  - set_fact:
+     ip_address: "{{ bigip_ip_address['ansible_facts']['cloudformation']['Stack-StandaloneBIGIP-1nic-experimental']['stack_outputs']['Bigip1subnet1Az1SelfEipAddress']}}"
