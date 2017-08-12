@@ -1,0 +1,33 @@
+---
+- hosts: localhost
+  tasks:
+
+  #This task will get the iApp template from github(or any other link) and store it in local path specified
+  - name: Get iApp from Github
+    get_url:
+      url: https://github.com/F5Networks/f5-application-services-integration-iApp/releases/download/v2.0.003/appsvcs_integration_v2.0.003.tmpl
+      dest: /var/tmp
+      validate_certs: False
+
+  #Upload the iApp templated downloaded above to the BIG-IP
+  - name: Upload iApp template to BIG-IP
+    bigip_iapp_template:
+      server: "10.192.XX.XXX"
+      user: "admin"
+      password: "admin"
+      content: "{{ lookup('file', '/var/tmp/appsvcs_integration_v2.0.003.tmpl') }}"
+      state: "present"
+      validate_certs: False
+    delegate_to: localhost
+
+  #The body of the iApp is passed in an a JSON blob.
+  - name: Deploy iApp
+    bigip_iapp_service:
+      name: "HTTP_VS_With_L7Firewall"
+      template: "appsvcs_integration_v2.0.003"
+      parameters: "{{ lookup('file', 'final_iapp_with_asm.json') }}"
+      server: "10.192.XX.XXX"
+      user: "admin"
+      password: "admin"
+      state: "present"
+    delegate_to: localhost
