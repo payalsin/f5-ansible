@@ -1,0 +1,86 @@
+---
+- name: Onboarding BIG-IP
+  hosts: bigip
+  gather_facts: false
+  vars_files:
+    - var-onboard-network_file.yml
+
+  tasks:
+
+  - name: Configure NTP server on BIG-IP
+    bigip_device_ntp:
+      server: "{{ inventory_hostname }}"
+      user: "{{ username }}"
+      password: "{{ password }}"
+      ntp_servers: "{{ ntp_servers }}"
+      validate_certs: False
+    delegate_to: localhost
+
+  - name: Configure BIG-IP hostname
+    bigip_hostname:
+      server: "{{ inventory_hostname }}"
+      user: "{{ username }}"
+      password: "{{ password }}"
+      validate_certs: False
+      hostname: "{{ hostname }}"
+    delegate_to: localhost
+
+  - name: Manage SSHD setting on BIG-IP
+    bigip_device_sshd:
+      server: "{{ inventory_hostname }}"
+      user: "{{ username }}"
+      password: "{{ password }}"
+      banner: "enabled"
+      banner_text: " {{ banner_text }}"
+      validate_certs: False
+    delegate_to: localhost
+
+  - name: Manage BIG-IP DNS settings
+    bigip_device_dns:
+     server: "{{ inventory_hostname }}"
+     user: "{{ username }}"
+     password: "{{ password }}"
+     name_servers: "{{ dns_servers }}"
+     search: "{{ dns_search_domains }}"
+     forwarders: "{{ bind_servers }}"
+     ip_version: "{{ ip_version }}"
+     validate_certs: False
+    delegate_to: localhost
+
+  - name: Provision BIG-IP with appropriate modules
+    bigip_provision:
+      server: "{{ inventory_hostname }}"
+      user: "{{ username }}"
+      password: "{{ password }}"
+      validate_certs: False
+      module: "{{ item.name }}"
+      level: "{{ item.level }}"
+    with_items: "{{ module_provisioning }}"
+    tags: provision
+    delegate_to: localhost
+
+  - name: Configure VLANs on the BIG-IP
+    bigip_vlan:
+     server: "{{ inventory_hostname }}"
+     user: "{{ username }}"
+     password: "{{ password }}"
+     validate_certs: False
+     name: "{{ item.name }}"
+     tag: "{{ item.tag }}"
+     tagged_interface: "{{ item.interface }}"
+    with_items: "{{ vlan_information }}"
+    delegate_to: localhost
+
+  - name: Configure SELF-IPs on the BIG-IP
+    bigip_selfip:
+     server: "{{ inventory_hostname }}"
+     user: "{{ username }}"
+     password: "{{ password }}"
+     validate_certs: False
+     name: "{{ item.name }}"
+     address: "{{ item.address }}"
+     netmask: "{{ item.netmask }}"
+     vlan: "{{ item.vlan }}"
+     allow_service: "{{item.allow_service}}"
+    with_items: "{{ selfip_information }}"
+    delegate_to: localhost
