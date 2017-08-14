@@ -1,0 +1,113 @@
+---
+
+#You can run this playbook by passing the pool and node name via the command line itself
+#Example: ansible-playbook playbooks/facts.yaml --extra-vars "node_name=web02.internal pool_name=web-pool"
+#This is a workflow to
+#- Check the pool status
+#- Disable the node in the pool (confirm the node got disabled)
+#- Perform an upgrade on the node member
+#- Enable the node in the pool (confirm the node got enabled)
+
+- name: Update software on Pool Member - "{{node_name}}"
+  hosts: bigip
+  gather_facts: false
+  vars:
+    pool_name: "{{pool_name}}"
+    node_name: "{{node_name}}"
+
+  tasks:
+  - name: Query BIG-IP facts for Pool Status - "{{pool_name}}"
+    bigip_facts:
+       validate_certs: False
+       server: "{{inventory_hostname}}"
+       user: "{{username}}"
+       password: "{{password}}"
+       include: "pool"
+    delegate_to: localhost
+    register: bigip_facts
+
+  - name: debug
+    debug: msg="{{bigip_facts}}"
+
+  - name: Assert that Pool - "{{pool_name}}" is available before disabling node
+    assert:
+     that:
+      - "'AVAILABILITY_STATUS_GREEN' in bigip_facts['ansible_facts']['pool']['/Common/{{pool_name}}']['object_status']['availability_status']|string"
+     msg: "Pool is NOT available DONOT want to disable any more nodes..Check your BIG-IP"
+
+  - name: Disable Node - "{{node_name}}"
+    bigip_node:
+      server: "{{inventory_hostname}}"
+      user: "{{username}}"
+      password: "{{password}}"
+      partition: "Common"
+      name: "{{node_name}}"
+      state: "present"
+      session_state: "disabled"
+      monitor_state: "disabled"
+    delegate_to: localhost
+
+  - name: Get Node facts - "{{node_name}}"
+    bigip_facts:
+       validate_certs: False
+       server: "{{inventory_hostname}}"
+       user: "{{username}}"
+       password: "{{password}}"
+       include: "node"
+    delegate_to: localhost
+    register: bigip_facts
+
+  - name: Assert that node - "{{node_name}}" did get disabled
+    assert:
+     that:
+        - "'AVAILABILITY_STATUS_RED' in bigip_facts['ansible_facts']['node']['/Common/{{node_name}}']['object_status']['availability_status']|string"
+     msg: "Pool member did NOT get DISABLED"
+
+- name: Perform software update on node - "{{node_name}}"
+  hosts: "{{node_name}}"
+  gather_facts: false
+  vars:
+    pool_name: "{{pool_name}}"
+    node_name: "{{node_name}}"
+
+  tasks:
+
+  - name: "Upgrade all packages"
+    apt: name=* state=latest
+
+- name: Enable Node
+  hosts: bigip
+  gather_facts: false
+  vars:
+    pool_name: "{{pool_name}}"
+    node_name: "{{node_name}}"
+
+  tasks:
+
+  - name: Enable Node - "{{node_name}}"
+    bigip_node:
+      server: "{{inventory_hostname}}"
+      user: "{{username}}"
+      password: "{{password}}"
+      partition: "Common"
+      name: "{{node_name}}"
+      state: "present"
+      session_state: "enabled"
+      monitor_state: "enabled"
+    delegate_to: localhost
+
+  - name: Get Node facts - "{{node_name}}"
+    bigip_facts:
+      validate_certs: False
+      server: "{{inventory_hostname}}"
+      user: "{{username}}"
+      password: "{{password}}"
+      include: "node"
+    delegate_to: localhost
+    register: bigip_facts
+
+  - name: Assert that node - "{{node_name}}" did get enabled
+    assert:
+      that:
+        - "'AVAILABILITY_STATUS_BLUE' in bigip_facts['ansible_facts']['node']['/Common/{{node_name}}']['object_status']['availability_status']|string"
+      msg: "Pool member did NOT get ENABLED"
