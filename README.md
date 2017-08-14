@@ -6,6 +6,7 @@ Workflows
 - HA: Playbook to create a BIG-IP HA pair using the bigip_command module - "create-ha-plyabook.yaml"
 - iApp: Playbook to upload the iApp to the BIG-IP and then deploy the iApp -"upload_and_deploy_iapp.yml"
 - Onboarding a BIG-IP (NTP/DNS/Hostname/Provisioning/VLAN/SelfIP) - "onboarding-bigip.yml"
+- Node maintenence: Disable a node member ,perform an upgrade on the node, enable the node member - "node_member_maintanence.yml"
 
 Private Cloud
 -------------
