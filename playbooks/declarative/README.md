@@ -7,7 +7,7 @@ Workflow
 
 Example
 --------
-## Onboarding BIG-IP ##
+#Onboarding BIG-IP
 onboarding: "yes" #Options: yes/no
 banner_text: "--------Welcome to demo UnManaged BIGIP----------"
 
@@ -30,7 +30,7 @@ standalone: "no" #Options: yes/no
 #What service do you want to deploy on the BIG-IP
 service: "http_service" #Options: http_service/https_service
 
-# BIG-IP related inforamtion
+#BIG-IP related inforamtion
 consumer_vlan_name: "External_VLAN"
 consumer_vlan: "900"
 consumer_interface: "1.1"
