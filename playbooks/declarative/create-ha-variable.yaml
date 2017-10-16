@@ -1,0 +1,168 @@
+---
+  - name: Add HA VLAN on BIG-IP1
+    bigip_vlan:
+      server: "{{bigip1_ip}}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      name: "{{ ha_vlan }}"
+      tag: "{{ ha_vlan_tag }}"
+      untagged_interfaces:
+      - "{{ha_interface}}"
+      validate_certs: "no"
+    delegate_to: localhost
+
+  - name: Add HA VLAN on BIG-IP2
+    bigip_vlan:
+      server: "{{bigip2_ip}}"
+      user: "{{ bigip2_username }}"
+      password: "{{ bigip2_password }}"
+      name: "{{ ha_vlan }}"
+      tag: "{{ ha_vlan_tag }}"
+      untagged_interfaces:
+      - "{{ha_interface}}"
+      validate_certs: "no"
+    delegate_to: localhost
+
+  - name: Configure SELF-IP for HA on the BIG-IP1
+    bigip_selfip:
+     server: "{{ bigip1_ip }}"
+     user: "{{ bigip1_username }}"
+     password: "{{ bigip1_password }}"
+     validate_certs: False
+     name: "Selfip1_HA"
+     address: "{{ bigip1_selfip }}"
+     netmask: "255.255.255.0"
+     vlan: "{{ ha_vlan }}"
+     traffic_group: "traffic-group-local-only"
+    delegate_to: localhost
+
+  - name: Configure SELF-IP for HA on the BIG-IP2
+    bigip_selfip:
+     server: "{{ bigip2_ip }}"
+     user: "{{ bigip2_username }}"
+     password: "{{ bigip2_password }}"
+     validate_certs: False
+     name: "Selfip2_HA"
+     address: "{{ bigip2_selfip }}"
+     netmask: "255.255.255.0"
+     vlan: "{{ ha_vlan }}"
+     traffic_group: "traffic-group-local-only"
+    delegate_to: localhost
+  
+  - name: Change device name of BIG-IP1
+    bigip_command:
+      server: "{{ bigip1_ip }}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      commands:
+      - mv cm device {{ bigip1_old_name }} {{ bigip1_new_name }}
+    delegate_to: localhost
+
+  - name: Change device name of BIG-IP2
+    bigip_command:
+      server: "{{ bigip2_ip }}"
+      user: "{{ bigip2_username }}"
+      password: "{{ bigip2_password }}"
+      commands:
+      - mv cm device {{ bigip2_old_name }} {{ bigip2_new_name }} 
+    delegate_to: localhost
+ 
+  - name: Set config sync address on BIG-IP1
+    bigip_command:
+      server: "{{ bigip1_ip }}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      commands:
+      - modify cm device {{ bigip1_new_name }} configsync-ip {{ bigip1_selfip }}
+    delegate_to: localhost  
+
+  - name: Set config sync address on BIG-IP2
+    bigip_command:
+      server: "{{ bigip2_ip }}"
+      user: "{{ bigip2_username }}"
+      password: "{{ bigip2_password }}"
+      commands:
+      - modify cm device {{ bigip2_new_name }} configsync-ip {{ bigip2_selfip }}
+    delegate_to: localhost
+
+  - name: Set unicast address on BIG-IP1
+    bigip_command:
+      server: "{{ bigip1_ip }}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      commands:
+      - modify cm device {{ bigip1_new_name }} unicast-address { { ip {{ bigip1_selfip }} } { ip {{ bigip1_ip }} } }
+    delegate_to: localhost
+
+  - name: Set unicast address on BIG-IP2
+    bigip_command:
+      server: "{{ bigip2_ip }}"
+      user: "{{ bigip2_username }}"
+      password: "{{ bigip2_password }}"
+      commands:
+      - modify cm device {{ bigip2_new_name }} unicast-address { { ip {{ bigip2_selfip }} } { ip {{ bigip2_ip }} } }
+    delegate_to: localhost
+
+  - name: Discover device for trust on BIG-IP1
+    bigip_command:
+      server: "{{ bigip1_ip }}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      commands:
+      - modify cm trust-domain Root ca-devices add { {{ bigip2_ip }} } name {{ bigip2_new_name }} username admin password admin
+    delegate_to: localhost
+
+  - name: Check sync and failover status of BIG-IP1
+    bigip_command:
+      server: "{{ bigip1_ip }}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      commands:
+       - show cm sync-status
+      wait_for:
+       - result[0] contains "green"
+      match: all
+    delegate_to: localhost
+
+  - name: Check sync and failover status of BIG-IP2
+    bigip_command:
+      server: "{{ bigip2_ip }}"
+      user: "{{ bigip2_username }}"
+      password: "{{ bigip2_password }}"
+      commands:
+       - show cm sync-status
+      wait_for:
+       - result[0] contains "green"
+      match: all
+    delegate_to: localhost
+
+  - name: Create device group of type sync-failover
+    bigip_command:
+      server: "{{ bigip1_ip }}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      commands:
+       - create cm device-group DG devices add { {{ bigip1_new_name }} {{ bigip2_new_name }} } type sync-failover network-failover enabled auto-sync enabled
+    delegate_to: localhost
+
+  - name: Perform initial sync of device-group
+    bigip_command:
+      server: "{{ bigip1_ip }}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      commands:
+       - run cm config-sync to-group DG
+    delegate_to: localhost
+
+  - name: Confirm HA pair if formed
+    bigip_command:
+      server: "{{ bigip1_ip }}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      commands:
+       - show cm sync-status
+      wait_for:
+       - result[0] contains "high-availability"
+    delegate_to: localhost
+
+

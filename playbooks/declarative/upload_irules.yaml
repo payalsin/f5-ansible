@@ -1,0 +1,11 @@
+  - name: Add iRules
+    bigip_irule:
+      server: "{{bigip1_ip}}"
+      user: "{{bigip1_username}}"
+      password: "{{bigip1_password}}"
+      module: "ltm"
+      name: "{{item}}"
+      content: "{{ lookup('file', '{{item}}') }}"
+      state: present
+    with_items: "{{rule}}"
+    delegate_to: localhost

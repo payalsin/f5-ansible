@@ -1,0 +1,37 @@
+  - name: Configure NTP server on BIG-IP
+    bigip_device_ntp:
+      server: "{{ bigip_ip }}"
+      user: "{{ bigip_username }}"
+      password: "{{ bigip_password }}"
+      ntp_servers: "{{ ntp_servers }}"
+      validate_certs: False
+    delegate_to: localhost
+
+  - name: Configure BIG-IP hostname
+    bigip_hostname:
+      server: "{{ bigip_ip }}"
+      user: "{{ bigip_username }}"
+      password: "{{ bigip_password }}"
+      validate_certs: False
+      hostname:  "{{ hostname }}"
+    delegate_to: localhost
+
+  - name: Manage SSHD setting on BIG-IP
+    bigip_device_sshd:
+      server: "{{ bigip_ip }}"
+      user: "{{ bigip_username }}"
+      password: "{{ bigip_password }}"
+      banner: "enabled"
+      banner_text: " {{ banner_text }}"
+      validate_certs: False
+    delegate_to: localhost
+
+  - name: Manage BIG-IP DNS settings
+    bigip_device_dns:
+     server: "{{ bigip_ip }}"
+     user: "{{ bigip_username }}"
+     password: "{{ bigip_password }}"
+     name_servers: "{{ dns_servers }}"
+     ip_version: "{{ ip_version }}"
+     validate_certs: False
+    delegate_to: localhost

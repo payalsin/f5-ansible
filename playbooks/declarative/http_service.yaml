@@ -1,0 +1,54 @@
+  - name: Create nodes
+    bigip_node:
+      server: "{{ bigip1_ip }}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      host: "{{item.host}}"
+      name: "{{item.host}}"
+      validate_certs: "no"
+    with_items: "{{pool_members}}"
+    delegate_to: localhost
+
+  - name: Create pool
+    bigip_pool:
+      server: "{{ bigip1_ip }}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      state: "present"
+      name: "http-pool"
+      lb_method: "round-robin"
+      monitors: "/Common/http"
+      monitor_type: "and_list"
+      quorum: 1
+    delegate_to: localhost
+
+  - name: Add Pool members
+    bigip_pool_member:
+      server: "{{ bigip1_ip }}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      name: "{{item.host}}"
+      host: "{{item.host}}"
+      port: "{{item.port}}"
+      pool: "http-pool"
+      validate_certs: False
+    with_items: "{{pool_members}}"
+    delegate_to: localhost
+
+  - name: Add Virtual Server
+    bigip_virtual_server:
+      server: "{{ bigip1_ip }}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      name: "{{vip_name}}"
+      destination: "{{vip_ip}}"
+      port: "{{vip_port}}"
+      enabled_vlans:
+       - "{{consumer_vlan_name}}"
+       - "{{provider_vlan_name}}"
+      all_profiles: "{{ profiles | default(omit) }}"
+      pool: "http-pool"
+      snat: "Automap"
+      all_rules: "{{ rule | default(omit) }}"
+      validate_certs: False
+    delegate_to: localhost
