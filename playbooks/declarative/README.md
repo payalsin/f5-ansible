@@ -13,7 +13,7 @@ Example Variable File
 ```
 ## Onboarding BIG-IP ##
 onboarding: "yes" #Options: yes/no
-banner_text: "--------Welcome to demo UnManaged BIGIP----------"
+banner_text: "--------Welcome to demo BIGIP----------"
 
 bigip1_hostname: 'bigip1.local'
 bigip2_hostname: 'bigip2.local'
