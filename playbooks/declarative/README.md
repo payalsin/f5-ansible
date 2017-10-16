@@ -10,7 +10,7 @@ Workflow
 
 Example Variable File
 ---------------------
-
+```
 ## Onboarding BIG-IP ##
 onboarding: "yes" #Options: yes/no
 banner_text: "--------Welcome to demo UnManaged BIGIP----------"
@@ -118,3 +118,5 @@ upload_irule: "yes"
 profiles:
 - http
 - httpcompression
+
+```
