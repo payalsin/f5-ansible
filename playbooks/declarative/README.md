@@ -12,7 +12,7 @@ Example Variable File
 ---------------------
 ```
 ## Onboarding BIG-IP ##
-onboarding: "yes" #Options: yes/no
+onboarding: "yes" #Options: yes/no. For now ONLY standalone (option: yes) is supported
 banner_text: "--------Welcome to demo BIGIP----------"
 
 bigip1_hostname: 'bigip1.local'
