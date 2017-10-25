@@ -2,7 +2,7 @@ Workflow
 ---------
 - Take input from a variable files and based on input configure the BIG-IP
   - Onboarding - yes/no
-  - Standalone - yes/no
+  - Standalone - yes/no - ONLY standalone supported right now, so ONLY option yes
   - What type of application - http/https
   - IP address's
   
@@ -13,6 +13,7 @@ Example Variable File
 ```
 ## Onboarding BIG-IP ##
 onboarding: "yes" #Options: yes/no. 
+standalone: "yes"
 banner_text: "--------Welcome to demo BIGIP----------"
 
 bigip1_hostname: 'bigip1.local'
@@ -41,22 +42,8 @@ provider_vlan: "901"
 provider_interface: "1.1"
 
 bigip1_ip: 10.192.74.53
-bigip2_ip: 10.192.74.52
 bigip1_username: "admin"
 bigip1_password: "admin"
-bigip2_username: "admin"
-bigip2_password: "admin"
-
-#Information needed if BIG-IP is setup in HA pair
-bigip2_old_name: bigip-ha2
-bigip2_new_name: bigip-ha2
-bigip1_old_name: bigip-ha1
-bigip1_new_name: bigip-ha1
-bigip1_selfip: 1.1.1.4
-bigip2_selfip: 1.1.1.5
-ha_vlan: OOB_HA
-ha_vlan_tag: "3"
-ha_interface: "1.3"
 
 #SELF-IP and floating IP information
 bigip1_selfip_information:
@@ -66,26 +53,6 @@ bigip1_selfip_information:
   vlan: "External_VLAN"
 - name: 'Internal-SelfIP'
   address: '192.168.68.10'
-  netmask: '255.255.255.0'
-  vlan: 'Internal_VLAN'
-
-floating_selfip_information:
-- name: 'External-Floating-SelfIP'
-  address: '10.168.68.15'
-  netmask: '255.255.255.0'
-  vlan: 'External_VLAN'
-- name: 'Internal-Floating-SelfIP'
-  address: '192.168.68.15'
-  netmask: '255.255.255.0'
-  vlan: 'Internal_VLAN'
-
-bigip2_selfip_information:
-- name: 'External-SelfIP'
-  address: '10.168.68.11'
-  netmask: '255.255.255.0'
-  vlan: "External_VLAN"
-- name: 'Internal-SelfIP'
-  address: '192.168.68.11'
   netmask: '255.255.255.0'
   vlan: 'Internal_VLAN'
 
