@@ -34,7 +34,7 @@
       validate_certs: "no"
     delegate_to: localhost
 
-  - name: Configure SELF-IP on BIG-IP1
+  - name: Configure SELF-IP(s) on BIG-IP1
     bigip_selfip: 
      server: "{{bigip1_ip}}"
      user: "{{ bigip1_username }}"
