@@ -10,12 +10,6 @@
   - include: onboarding.yaml bigip_ip="{{bigip1_ip}}" bigip_username="{{bigip1_username}}" bigip_password="{{bigip1_password}}" hostname="{{bigip1_hostname}}"
     when: '"yes" in onboarding '
 
-  - include: onboarding.yaml bigip_ip="{{bigip2_ip}}" bigip_username="{{bigip2_username}}" bigip_password="{{bigip2_password}}" hostname="{{bigip2_hostname}}"
-    when: '"yes" in onboarding '
-
-  #- include_tasks: create-ha-variable.yaml
-  #  when: '"no" in standalone '
-
   - name: Add Provider VLAN on BIG-IP1
     bigip_vlan:
       server: "{{bigip1_ip}}"
@@ -52,61 +46,6 @@
      vlan: "{{item.vlan}}"
     with_items: "{{ bigip1_selfip_information }}"
     delegate_to: localhost
-
-  - name: Add Provider VLAN on BIG-IP2
-    bigip_vlan:
-      server: "{{bigip2_ip}}"
-      user: "{{ bigip2_username }}"
-      password: "{{ bigip2_password }}"
-      name: "{{consumer_vlan_name}}"
-      tag: "{{consumer_vlan}}"
-      tagged_interfaces:
-      - "{{consumer_interface}}"
-      validate_certs: "no"
-    delegate_to: localhost
-    when: '"no" in standalone '
-
-  - name: Add Consumer VLAN on BIG-IP2
-    bigip_vlan:
-      server: "{{bigip2_ip}}"
-      user: "{{ bigip2_username }}"
-      password: "{{ bigip2_password }}"
-      name: "{{provider_vlan_name}}"
-      tag: "{{provider_vlan}}"
-      tagged_interfaces:
-      - "{{provider_interface}}"
-      validate_certs: "no"
-    delegate_to: localhost
-    when: '"no" in standalone '
-
-  - name: Configure SELF-IP on BIG-IP2
-    bigip_selfip:
-     server: "{{bigip2_ip}}"
-     user: "{{ bigip2_username }}"
-     password: "{{ bigip2_password }}"
-     validate_certs: False
-     name: "{{item.name}}"
-     address: "{{item.address}}"
-     netmask: "{{item.netmask}}"
-     vlan: "{{item.vlan}}"
-    with_items: "{{ bigip2_selfip_information }}"
-    delegate_to: localhost
-    when: '"no" in standalone'
-
-  - name: Add floating IP's
-    bigip_selfip:
-     server: "{{bigip1_ip}}"
-     user: "{{ bigip1_username }}"
-     password: "{{ bigip1_password }}"
-     validate_certs: False
-     name: "{{item.name}}"
-     address: "{{item.address}}"
-     netmask: "{{item.netmask}}"
-     vlan: "{{item.vlan}}"
-     traffic_group: "/Common/traffic-group-1"
-    with_items: "{{ floating_selfip_information }}"
-    delegate_to: localhost
-    when: '"no" in standalone '
 
   - include_tasks: upload_irules.yaml
     when: '"yes" in upload_irule '
