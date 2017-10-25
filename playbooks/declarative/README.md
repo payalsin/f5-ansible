@@ -28,9 +28,6 @@ dns_servers:
 
 ip_version: 4
 
-#Do you want to setup BIG-IP in HA or Standalone mode
-standalone: "no" #Options: yes/no
-
 #What service do you want to deploy on the BIG-IP
 service: "http_service" #Options: http_service/https_service 
 
