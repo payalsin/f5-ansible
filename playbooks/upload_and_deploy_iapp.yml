@@ -30,4 +30,5 @@
       user: "admin"
       password: "admin"
       state: "present"
+      validae_certs: False
     delegate_to: localhost
