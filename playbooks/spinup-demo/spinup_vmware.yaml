@@ -1,0 +1,223 @@
+- name: Spin up BIG-IP VE in VMware
+  hosts: localhost
+  connection: local
+  vars_files:
+    - var-onboard-network_file.yml
+
+  environment:
+    F5_USER: "{{ username }}"
+    F5_PASSWORD: "{{ password }}"
+    F5_SERVER_PORT: "443"
+    F5_VALIDATE_CERTS: "False"
+    GOVC_URL: "https://10.192.73.100/sdk"
+    GOVC_USERNAME: "root"
+    GOVC_PASSWORD: "vmware"
+    GOVC_INSECURE: "1"
+    GOVC_DATACENTER: "F5 BD Lab"
+    GOVC_DATASTORE: "datastore1 (2)"
+    GOVC_RESOURCE_POOL: "Testing"
+
+  tasks:
+
+  - name: Check for existing VM
+    command: "/usr/local/bin/govc vm.info {{ vm_guest_name }}"
+    register: vm_info
+
+  - name: Import OVA
+    command: "/usr/local/bin/govc import.ova -name={{ vm_guest_name }} /root/BIGIP-12.1.2.0.0.249.ALL-scsi.ova"
+    when: "'UUID' not in vm_info.stdout"
+
+  - name: Power on VM
+    command: "/usr/local/bin/govc vm.power -on {{ vm_guest_name }}"
+    when: "'poweredOn' not in vm_info.stdout"
+
+  - name: Reconfigure BIG-IP VE network adaptors
+    vsphere_guest:
+      vcenter_hostname: 10.192.73.100
+      esxi:
+        datacenter: F5 BD Lab
+        hostname: 10.192.73.22
+      username: root
+      password: vmware
+      guest: "{{ vm_guest_name }}"
+      state: reconfigured
+      vm_nic:
+       nic1:
+        type: vmxnet3
+        network: Cisco-BD73-MGMT
+        network_type: standard
+       nic2:
+        type: vmxnet3
+        network: BlackHole
+        network_type: standard
+       nic3:
+        type: vmxnet3
+        network: BlackHole
+        network_type: standard
+
+  - name: Check for VM info
+    command: "/usr/local/bin/govc vm.ip {{ vm_guest_name }}"
+    register: govc_vm_info
+    until: govc_vm_info.stdout.find("10.192") != -1
+    retries: 30
+    delay: 10
+
+  - name: Setting IP Address
+    set_fact:
+     IPAddress: "{{ govc_vm_info['stdout']}}"
+
+  - name: Add IP Address to variable file
+    lineinfile:
+     dest: var-onboard-network_file.yml
+     line: "IPAddress: {{ IPAddress }}"
+     state: present
+     insertafter: EOF
+     
+  - name: Wait for BIG-IP to be ready
+    bigip_wait:
+     password: admin
+     server: "{{ IPAddress }}"
+     user: admin
+     validate_certs: false
+    delegate_to: localhost
+
+#License
+  - name: License BIG-IP using a key
+    bigip_device_license:
+      server: "{{ IPAddress }}"
+      user: "admin"
+      password: "admin"
+      license_key: "{{ license_key }}"
+      accept_eula: true
+      validate_certs: false
+    delegate_to: localhost
+
+  - name: Wait for BIG-IP to be ready to take configuration
+    bigip_wait:
+     server: "{{ IPAddress }}"
+    delegate_to: localhost
+
+#Provision
+  - name: Provision BIG-IP with appropriate modules
+    bigip_provision:
+      server: "{{ IPAddress }}"
+      module: "{{ item.name }}"
+      level: "{{ item.level }}"
+    with_items: "{{ module_provisioning }}"
+    delegate_to: localhost
+
+#Onboard
+  - name: Configure NTP server on BIG-IP
+    bigip_device_ntp:
+      server: "{{ IPAddress }}"
+      ntp_servers: "{{ ntp_servers }}"
+    delegate_to: localhost
+
+  - name: Configure BIG-IP hostname
+    bigip_hostname:
+      server: "{{ IPAddress }}"
+      hostname: "{{ hostname }}"
+    delegate_to: localhost
+
+  - name: Manage SSHD setting on BIG-IP
+    bigip_device_sshd:
+      server: "{{ IPAddress }}"
+      banner: "enabled"
+      banner_text: " {{ banner_text }}"
+    delegate_to: localhost
+
+  - name: Manage BIG-IP DNS settings
+    bigip_device_dns:
+     server: "{{ IPAddress }}"
+     name_servers: "{{ dns_servers }}"
+    delegate_to: localhost
+
+#Network
+  - name: Configure VLANs on the BIG-IP
+    bigip_vlan:
+     server: "{{ IPAddress }}"
+     name: "{{ item.name }}"
+     tag: "{{ item.tag }}"
+     untagged_interface: "{{ item.interface }}"
+    with_items: "{{ vlan_information }}"
+    delegate_to: localhost
+
+  - name: Configure SELF-IPs on the BIG-IP
+    bigip_selfip:
+     server: "{{ IPAddress }}"
+     name: "{{ item.name }}"
+     address: "{{ item.address }}"
+     netmask: "{{ item.netmask }}"
+     vlan: "{{ item.vlan }}"
+     allow_service: "{{item.allow_service}}"
+    with_items: "{{ selfip_information }}"
+    delegate_to: localhost
+
+#Deploy ASM policy
+  - name: Create an LTM policy
+    bigip_policy:
+      server: "{{ IPAddress }}"
+      name: asm-policy
+
+  - name: Import and activate ASM policy
+    bigip_asm_policy:
+      server: "{{ IPAddress }}"
+      name: Demo
+      file: "/root/asm_policy1.xml"
+      active: yes
+      state: present
+    delegate_to: localhost
+
+  - name: Replace a forward action with an ASM action - Idempotent check
+    bigip_policy_rule:
+      server: "{{ IPAddress }}"
+      policy: asm-policy
+      name: rule1
+      actions:
+      - type: enable
+        asm_policy: Demo
+
+#Create VS/Pool etc
+
+  - name: Create nodes
+    bigip_node:
+      server: "{{ IPAddress }}"
+      host: "{{item.host}}"
+      name: "{{item.host}}"
+    with_items: "{{pool_members}}"
+    delegate_to: localhost
+
+  - name: Create pool
+    bigip_pool:
+      server: "{{ IPAddress }}"
+      state: "present"
+      name: "http-pool"
+      lb_method: "round-robin"
+      monitors: "/Common/http"
+      monitor_type: "and_list"
+    delegate_to: localhost
+
+  - name: Add Pool members
+    bigip_pool_member:
+      server: "{{ IPAddress }}"
+      name: "{{item.host}}"
+      host: "{{item.host}}"
+      port: "{{item.port}}"
+      pool: "http-pool"
+    with_items: "{{pool_members}}"
+    delegate_to: localhost
+
+  - name: Add Virtual Server
+    bigip_virtual_server:
+      server: "{{ IPAddress }}"
+      name: "{{vip_name}}"
+      destination: "{{vip_ip}}"
+      port: "{{vip_port}}"
+      pool: "http-pool"
+      snat: "Automap"
+      profiles:
+       - http
+       - websecurity
+      policies:
+       - asm-policy
+    delegate_to: localhost
