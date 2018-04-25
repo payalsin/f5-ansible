@@ -1,0 +1,51 @@
+vm_guest_name: "newVM-BIGIP005_4"
+license_key: "XYGHZ-DLOFZ-KOTGG-RTGQT-HZQFCUF"
+
+username: admin
+password: admin
+
+banner_text: "--------Welcome to Onboarding BIGIP----------"
+
+hostname: 'bigip.local'
+
+ntp_servers:
+ - '172.27.1.1'
+ - '172.27.1.2'
+
+dns_servers:
+ - '8.8.8.8'
+ - '4.4.4.4'
+
+vlan_information:
+ - name: 'External'
+   tag: '10'
+   interface: '1.1'
+ - name: 'Internal'
+   tag: '11'
+   interface: '1.2'
+
+selfip_information:
+ - name: 'External-SelfIP'
+   address: '10.168.68.5'
+   netmask: '255.255.255.0'
+   vlan: 'External'
+   allow_service: 'default'
+ - name: 'Internal-SelfIP'
+   address: '192.168.68.5'
+   netmask: '255.255.255.0'
+   vlan: 'Internal'
+   allow_service: 'default'
+
+module_provisioning:
+ - name: 'asm'
+   level: 'nominal'
+
+#VIP information
+vip_name: "http_vs"
+vip_port: "80"
+vip_ip: "10.168.68.12"
+
+#Pool memeber information
+pool_members:
+- port: "80"
+  host: "192.168.68.141"
