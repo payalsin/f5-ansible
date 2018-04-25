@@ -2,7 +2,7 @@
   hosts: localhost
   connection: local
   vars_files:
-    - var-onboard-network_file.yml
+    - var.yml
 
   environment:
     F5_USER: "{{ username }}"
@@ -68,7 +68,7 @@
 
   - name: Add IP Address to variable file
     lineinfile:
-     dest: var-onboard-network_file.yml
+     dest: var.yml
      line: "IPAddress: {{ IPAddress }}"
      state: present
      insertafter: EOF
