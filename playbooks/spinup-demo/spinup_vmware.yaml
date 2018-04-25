@@ -163,7 +163,7 @@
     bigip_asm_policy:
       server: "{{ IPAddress }}"
       name: Demo
-      file: "/root/asm_policy1.xml"
+      file: "asm_policy.xml"
       active: yes
       state: present
     delegate_to: localhost
