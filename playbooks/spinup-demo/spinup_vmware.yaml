@@ -66,12 +66,12 @@
     set_fact:
      IPAddress: "{{ govc_vm_info['stdout']}}"
 
-  - name: Add IP Address to variable file
-    lineinfile:
-     dest: var.yml
-     line: "IPAddress: {{ IPAddress }}"
-     state: present
-     insertafter: EOF
+ # - name: Add IP Address to variable file
+ #   lineinfile:
+ #    dest: var.yml
+ #    line: "IPAddress: {{ IPAddress }}"
+ #    state: present
+ #    insertafter: EOF
      
   - name: Wait for BIG-IP to be ready
     bigip_wait:
