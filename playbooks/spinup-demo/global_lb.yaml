@@ -39,7 +39,7 @@
      link_discovery: enabled
      virtual_server_discovery: enabled
      devices:
-      - {'name': 'server_1', 'address': "{{selfip_information[0][address]}}"}  #Self-IP of LTM2
+      - {'name': 'server_1', 'address': '"{{selfip_information[0][address]}}"'}  #Self-IP of LTM2
     
   - name: Add member to DNS pool
     bigip_gtm_pool_member:
