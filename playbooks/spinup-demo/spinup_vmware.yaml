@@ -45,7 +45,7 @@
   #  when: "'poweredOn' not in vm_info.stdout"
 
   - name: Reconfigure BIG-IP VE network adaptors
-   vsphere_guest:
+    vsphere_guest:
       vcenter_hostname: 10.192.73.100
       esxi:
         datacenter: F5 BD Lab
