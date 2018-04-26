@@ -23,6 +23,7 @@
    dns_pool: "gtm_pool"
    LTM1_pool_disabled_name: "LTM1_http_vs"
    LTM1_IPAddress: "10.192.73.218"
+   dns_server_IPAddress: "10.192.73.219"
   
   vars_files:
     - var.yml
@@ -31,8 +32,8 @@
 
   - name: Create server
     bigip_gtm_server:
-     server: "{{ dns_server }}"
-     name: "{{ dserver_name }}"
+     server: "{{ dns_server_IPAddress }}"
+     name: "{{ server_name }}"
      datacenter: "/Common/{{datacenter_name}}"
      server_type: bigip
      link_discovery: enabled
@@ -42,7 +43,7 @@
     
   - name: Add member to DNS pool
     bigip_gtm_pool_member:
-     server: "{{ dns_server }}"
+     server: "{{ dns_server_IPAddress }}"
      virtual_server: "/Common/{{ vip_name }}"
      server: "/Common/{{ server_name }}"
      pool: "{{ dns_pool }}"
