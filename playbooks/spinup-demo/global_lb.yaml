@@ -1,5 +1,6 @@
 - name: Global LB
   hosts: localhost
+  connection: local
   
   vars_files:
     - var.yml
@@ -32,8 +33,7 @@
      virtual_server_discovery: enabled
      devices:
        - {'name': 'server_1', 'address': "{{selfip_information[0].address}}"}  #Self-IP of LTM2
-    delegate_to: localhost
-    
+   
   - name: Add member to GTM pool
     bigip_gtm_pool:
      server: "{{ dns_server_IPAddress }}"
@@ -44,7 +44,6 @@
        virtual_server: "/Common/{{ ltm1_vip }}"
      - server: "/Common/{{ ltm2_server_name }}"
        virtual_server: "/Common/{{ ltm2_vip }}"
-    delegate_to: localhost
     retries: 5
     delay: 10
 
@@ -53,4 +52,3 @@
       server: "{{ ltm1_IPAddress }}"
       name: "{{ ltm1_vip }}"
       state: "disabled"
-    delegate_to: localhost
