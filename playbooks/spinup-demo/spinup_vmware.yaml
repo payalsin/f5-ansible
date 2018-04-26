@@ -13,9 +13,8 @@
     GOVC_USERNAME: "root"
     GOVC_PASSWORD: "vmware"
     GOVC_INSECURE: "1"
-    GOVC_DATACENTER: "F5 BD Lab"
-    GOVC_DATASTORE: "datastore1 (2)"
-    GOVC_RESOURCE_POOL: "Testing"
+   # GOVC_DATACENTER: "F5 BD Lab"
+   # GOVC_DATASTORE: "datastore1 (2)"
 
   tasks:
 
