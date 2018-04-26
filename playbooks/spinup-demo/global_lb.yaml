@@ -22,14 +22,14 @@
    server_name: "LTM2_Server"
    dns_pool: "gtm_pool"
    LTM1_pool_disabled_name: "LTM1_http_vs"
-   LTM1_IPAddress: "10.192,73.218"
+   LTM1_IPAddress: "10.192.73.218"
   
   vars_files:
     - var.yml
     
   tasks:
 
-  - name: Create server "{{ server_name }}"
+  - name: Create server
     bigip_gtm_server:
      server: "{{ dns_server }}"
      name: "{{ dserver_name }}"
@@ -50,7 +50,7 @@
     retries: 5
     delay: 10
      
-  - name: Disable Virtual Server( {{ LTM1_pool_disabled_name }}) on {{ LTM1_IPAddress }}
+  - name: Disable Virtual Server
     bigip_virtual_server:
       server: "{{ LTM1_IPAddress }}"
       name: "{{ LTM1_pool_disabled_name }}"
