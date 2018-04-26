@@ -29,7 +29,6 @@
 
   - name: Deploy BIG-IP VE in vCenter
     vsphere_guest:
-      #state: powered_on
       vcenter_hostname: 10.192.73.100
       esxi:
         datacenter: F5 BD Lab
@@ -40,6 +39,21 @@
       from_template: yes
       #Template already exists in vCenter 
       template_src: "BIG-IP VE 12.1.2.0.0.249-Template"
+        
+  #- name: Power on VM
+  #  command: "/usr/local/bin/govc vm.power -on {{ vm_guest_name }}"
+  #  when: "'poweredOn' not in vm_info.stdout"
+
+  - name: Reconfigure BIG-IP VE network adaptors
+   vsphere_guest:
+      vcenter_hostname: 10.192.73.100
+      esxi:
+        datacenter: F5 BD Lab
+        hostname: 10.192.73.22
+      username: root
+      password: vmware
+      guest: "{{ vm_guest_name }}"
+      state: reconfigured
       vm_nic:
        nic1:
         type: vmxnet3
@@ -53,34 +67,6 @@
         type: vmxnet3
         network: BlackHole
         network_type: standard
-        
-  #- name: Power on VM
-  #  command: "/usr/local/bin/govc vm.power -on {{ vm_guest_name }}"
-  #  when: "'poweredOn' not in vm_info.stdout"
-
-  #- name: Reconfigure BIG-IP VE network adaptors
-  #  vsphere_guest:
-  #    vcenter_hostname: 10.192.73.100
-  #    esxi:
-  #      datacenter: F5 BD Lab
-  #      hostname: 10.192.73.22
-  #    username: root
-  #    password: vmware
-  #    guest: "{{ vm_guest_name }}"
-  #    state: reconfigured
-  #    vm_nic:
-  #     nic1:
-  #      type: vmxnet3
-  #      network: Cisco-BD73-MGMT
-  #      network_type: standard
-  #     nic2:
-  #      type: vmxnet3
-  #      network: BlackHole
-  #      network_type: standard
-  #     nic3:
-  #      type: vmxnet3
-  #      network: BlackHole
-  #      network_type: standard
 
   - name: Check for VM info
     command: "/usr/local/bin/govc vm.ip {{ vm_guest_name }}"
