@@ -18,14 +18,6 @@
 
   tasks:
 
-  #- name: Check for existing VM
-  #  command: "/usr/local/bin/govc vm.info {{ vm_guest_name }}"
-  #  register: vm_info
-
-  #- name: Import OVA
-  #  command: "/usr/local/bin/govc import.ova -name={{ vm_guest_name }} /var/lib/awx/projects/_21__payal_git_project/playbooks/spinup-demoBIGIP-12.1.2.0.0.249.ALL-scsi.ova"
-  #  when: "'UUID' not in vm_info.stdout"
-
   - name: Deploy BIG-IP VE in vCenter
     vsphere_guest:
       vcenter_hostname: 10.192.73.100
@@ -39,10 +31,6 @@
       #Template already exists in vCenter 
       template_src: "BIG-IP VE 12.1.2.0.0.249-Template"
         
-  #- name: Power on VM
-  #  command: "/usr/local/bin/govc vm.power -on {{ vm_guest_name }}"
-  #  when: "'poweredOn' not in vm_info.stdout"
-
   - name: Reconfigure BIG-IP VE network adaptors
     vsphere_guest:
       vcenter_hostname: 10.192.73.100
@@ -77,14 +65,7 @@
   - name: Setting IP Address
     set_fact:
      IPAddress: "{{ govc_vm_info['stdout']}}"
-
- # - name: Add IP Address to variable file
- #   lineinfile:
- #    dest: var.yml
- #    line: "IPAddress: {{ IPAddress }}"
- #    state: present
- #    insertafter: EOF
-     
+ 
   - name: Wait for BIG-IP to be ready
     bigip_wait:
      password: admin
@@ -118,6 +99,11 @@
     with_items: "{{ module_provisioning }}"
     delegate_to: localhost
 
+  - name: Wait for BIG-IP to be ready after provisioning modules
+    bigip_wait:
+     server: "{{ IPAddress }}"
+    delegate_to: localhost
+    
 #Onboard
   - name: Configure NTP server on BIG-IP
     bigip_device_ntp:
