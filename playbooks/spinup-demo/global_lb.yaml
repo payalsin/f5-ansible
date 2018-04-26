@@ -1,9 +1,6 @@
----
 - name: Global LB
   hosts: localhost
-#  gather_facts: false
   connection: local
-
   vars_files:
     - var.yml
 
