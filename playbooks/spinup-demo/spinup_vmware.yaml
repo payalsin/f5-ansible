@@ -29,7 +29,7 @@
 
   - name: Deploy BIG-IP VE in vCenter
     vsphere_guest:
-      state: powered_on
+      #state: powered_on
       vcenter_hostname: 10.192.73.100
       esxi:
         datacenter: F5 BD Lab
