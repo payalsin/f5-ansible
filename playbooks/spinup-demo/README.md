@@ -19,6 +19,7 @@ Pre-requisites:
 Scenario1: Spin up BIG-IP VE in Vmware
 ----------------------------------
 Playbook: spinup_vmware.yaml
+
 Variables entered as part of survey using Ansible Tower
 - Guest name in vcenter (vm_guest_name)
 - BIG-IP template (template_src)
@@ -48,6 +49,7 @@ ONE MANUAL STEP: After scenario1 is run and new BIG-IP is spun up, it needs to e
 - For more details : https://support.f5.com/csp/article/K14495
 
 Playbook: global_lb.yaml
+
 Variables entered as part of survey using Ansible Tower
 - BIG-IP address (ltm1_IPAddress) (BIG-IP already synced with BIG-IP DNS)
 - Virtual server name in ltm1 which needs to be disabled (ltm1_vip)
