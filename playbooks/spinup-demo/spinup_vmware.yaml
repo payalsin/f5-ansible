@@ -24,7 +24,7 @@
     register: vm_info
 
   - name: Import OVA
-    command: "/usr/local/bin/govc import.ova -name={{ vm_guest_name }} /var/lib/awx/BIGIP-12.1.2.0.0.249.ALL-scsi.ova"
+    command: "/usr/local/bin/govc import.ova -name={{ vm_guest_name }} /tmp/BIGIP-12.1.2.0.0.249.ALL-scsi.ova"
     when: "'UUID' not in vm_info.stdout"
 
   - name: Power on VM
