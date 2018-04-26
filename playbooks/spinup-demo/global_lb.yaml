@@ -33,7 +33,7 @@
        - {'name': 'server_1', 'address': "{{selfip_information[0].address}}"}  #Self-IP of LTM2
    
   - wait_for:
-      timeout: 15
+      timeout: 20
       
   - name: Add member to GTM pool
     bigip_gtm_pool:
