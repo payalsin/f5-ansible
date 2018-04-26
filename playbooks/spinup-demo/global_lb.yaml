@@ -3,57 +3,54 @@
   hosts: localhost
   gather_facts: false
   connection: local
-  
+
+  vars_files:
+    - var.yml
+
   environment:
    F5_USER: "{{ username }}"
    F5_PASSWORD: "{{ password }}"
    F5_SERVER_PORT: "443"
    F5_VALIDATE_CERTS: "False"
-   GOVC_URL: "https://10.192.73.100/sdk"
-   GOVC_USERNAME: "root"
-   GOVC_PASSWORD: "vmware"
-   GOVC_INSECURE: "1"
-   GOVC_DATACENTER: "F5 BD Lab"
-   GOVC_DATASTORE: "datastore1 (2)"
-   GOVC_RESOURCE_POOL: "Testing"
-    
+ 
   vars:
-   datacenter_name: "San Jose"
-   server_name: "LTM2_Server"
+   datacenter_name: "/Common/San Jose"
+   ltm1_server_name: "LTM1_Server"
+   ltm2_server_name: "LTM2_Server"
+   ltm1_vip: "LTM1_http_vs"
+   ltm2_vip: "{{ vip_name }}"
    dns_pool: "gtm_pool"
-   LTM1_pool_disabled_name: "LTM1_http_vs"
-   LTM1_IPAddress: "10.192.73.218"
+   ltm1_IPAddress: "10.192.73.218"
    dns_server_IPAddress: "10.192.73.219"
-  
-  vars_files:
-    - var.yml
-    
+
   tasks:
 
   - name: Create server
     bigip_gtm_server:
      server: "{{ dns_server_IPAddress }}"
-     name: "{{ server_name }}"
-     datacenter: "/Common/{{datacenter_name}}"
+     name: "{{ ltm2_server_name }}"
+     datacenter: "{{datacenter_name}}"
      server_type: bigip
      link_discovery: enabled
      virtual_server_discovery: enabled
      devices:
-      - {'name': 'server_1', 'address': '"{{selfip_information[0][address]}}"'}  #Self-IP of LTM2
-    
-  - name: Add member to DNS pool
-    bigip_gtm_pool_member:
+      - {'name': 'server_1', 'address': "{{selfip_information[0].address}}"}  #Self-IP of LTM2
+
+  - name: Add member to GTM pool
+    bigip_gtm_pool:
      server: "{{ dns_server_IPAddress }}"
-     virtual_server: "/Common/{{ vip_name }}"
-     server_name: "/Common/{{ server_name }}"
-     pool: "{{ dns_pool }}"
+     name: "{{ dns_pool }}"
      type: a
+     members:
+     - server: "/Common/{{ ltm1_server_name }}"
+       virtual_server: "/Common/{{ ltm1_vip }}"
+     - server: "/Common/{{ ltm2_server_name }}"
+       virtual_server: "/Common/{{ ltm2_vip }}"
     retries: 5
     delay: 10
-     
+
   - name: Disable Virtual Server
     bigip_virtual_server:
-      server: "{{ LTM1_IPAddress }}"
-      name: "{{ LTM1_pool_disabled_name }}"
+      server: "{{ ltm1_IPAddress }}"
+      name: "{{ ltm1_vip }}"
       state: "disabled"
-   
