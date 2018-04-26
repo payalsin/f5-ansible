@@ -41,7 +41,7 @@ module_provisioning:
    level: 'nominal'
 
 #VIP information
-vip_name: "LTM1_http_vs"
+vip_name: "LTM2_http_vs"
 vip_port: "80"
 vip_ip: "10.168.68.12"
 
