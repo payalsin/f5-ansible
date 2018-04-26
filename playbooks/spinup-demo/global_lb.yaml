@@ -15,10 +15,8 @@
    datacenter_name: "/Common/San Jose"
    ltm1_server_name: "LTM1_Server"
    ltm2_server_name: "LTM2_Server"
-   ltm1_vip: "LTM1_http_vs"
    ltm2_vip: "{{ vip_name }}"
    dns_pool: "gtm_pool"
-   ltm1_IPAddress: "10.192.73.218"
    dns_server_IPAddress: "10.192.73.219"
 
   tasks:
