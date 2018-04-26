@@ -21,7 +21,7 @@
 
   tasks:
 
-  - name: Create server
+  - name: Create LTM server
     bigip_gtm_server:
      server: "{{ dns_server_IPAddress }}"
      name: "{{ ltm2_server_name }}"
@@ -30,12 +30,15 @@
      link_discovery: enabled
      virtual_server_discovery: enabled
      devices:
-       - {'name': 'server_1', 'address': "{{selfip_information[0].address}}"}  #Self-IP of LTM2
+       - {'name': 'server_1', 'address': "{{selfip_information[0].address}}"}  #Self-IP of LTM2 from var file
    
   - wait_for:
       timeout: 20
       
-  - name: Add member to GTM pool
+  #Ideally here we should use bigip_gtm_pool_member so that we dont have to pass in all the pool members but only the ones
+  #we want to add. There is an issue on gtm_pool_member due to which I am using this module as of now
+  #ISSUE: https://github.com/F5Networks/f5-ansible/issues/716
+  - name: Add LTM VIP to GTM pool
     bigip_gtm_pool:
      server: "{{ dns_server_IPAddress }}"
      name: "{{ dns_pool }}"
