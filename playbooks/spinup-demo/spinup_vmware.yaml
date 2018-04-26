@@ -71,7 +71,7 @@
     command: "/usr/local/bin/govc vm.ip {{ vm_guest_name }}"
     register: govc_vm_info
     until: govc_vm_info.stdout.find("10.192") != -1
-    retries: 30
+    retries: 50
     delay: 10
 
   - name: Setting IP Address
