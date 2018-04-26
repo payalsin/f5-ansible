@@ -1,0 +1,58 @@
+---
+- name: Global LB
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  
+  environment:
+   F5_USER: "{{ username }}"
+   F5_PASSWORD: "{{ password }}"
+   F5_SERVER_PORT: "443"
+   F5_VALIDATE_CERTS: "False"
+   GOVC_URL: "https://10.192.73.100/sdk"
+   GOVC_USERNAME: "root"
+   GOVC_PASSWORD: "vmware"
+   GOVC_INSECURE: "1"
+   GOVC_DATACENTER: "F5 BD Lab"
+   GOVC_DATASTORE: "datastore1 (2)"
+   GOVC_RESOURCE_POOL: "Testing"
+    
+  vars:
+   datacenter_name: "San Jose"
+   server_name: "LTM2_Server"
+   dns_pool: "gtm_pool"
+   LTM1_pool_disabled_name: "LTM1_http_vs"
+   LTM1_IPAddress: "10.192,73.218"
+  
+  vars_files:
+    - var.yml
+    
+  tasks:
+
+  - name: Create server "{{ server_name }}"
+    bigip_gtm_server:
+     server: "{{ dns_server }}"
+     name: "{{ dserver_name }}"
+     datacenter: "/Common/{{datacenter_name}}"
+     server_type: bigip
+     link_discovery: enabled
+     virtual_server_discovery: enabled
+     devices:
+      - {'name': 'server_1', 'address': "{{selfip_information[0][address]}}"}  #Self-IP of LTM2
+    
+  - name: Add member to DNS pool
+    bigip_gtm_pool_member:
+     server: "{{ dns_server }}"
+     virtual_server: "/Common/{{ vip_name }}"
+     server: "/Common/{{ server_name }}"
+     pool: "{{ dns_pool }}"
+     type: a
+    retries: 5
+    delay: 10
+     
+  - name: Disable Virtual Server( {{ LTM1_pool_disabled_name }}) on {{ LTM1_IPAddress }}
+    bigip_virtual_server:
+      server: "{{ LTM1_IPAddress }}"
+      name: "{{ LTM1_pool_disabled_name }}"
+      state: "disabled"
+   
