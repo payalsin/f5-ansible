@@ -45,7 +45,7 @@ ONE MANUAL STEP: After scenario1 is run and new BIG-IP is spun up, it needs to e
 - Login to the BIG-IP DNS and run the following two commmands:
    - /usr/local/bin/bigip_add <ltm_selfip>
    - /usr/local/bin/big3d_install <ltm_selfip>
-  For more details : https://support.f5.com/csp/article/K14495
+- For more details : https://support.f5.com/csp/article/K14495
 
 Playbook: global_lb.yaml
 Variables entered as part of survey using Ansible Tower
