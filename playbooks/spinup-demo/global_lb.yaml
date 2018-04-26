@@ -32,6 +32,9 @@
      devices:
        - {'name': 'server_1', 'address': "{{selfip_information[0].address}}"}  #Self-IP of LTM2
    
+  - wait_for:
+      timeout: 15
+      
   - name: Add member to GTM pool
     bigip_gtm_pool:
      server: "{{ dns_server_IPAddress }}"
@@ -42,8 +45,6 @@
        virtual_server: "/Common/{{ ltm1_vip }}"
      - server: "/Common/{{ ltm2_server_name }}"
        virtual_server: "/Common/{{ ltm2_vip }}"
-    retries: 5
-    delay: 10
 
   - name: Disable Virtual Server
     bigip_virtual_server:
