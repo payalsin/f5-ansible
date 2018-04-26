@@ -1,7 +1,6 @@
 - name: Spin up BIG-IP VE in VMware
   hosts: localhost
   connection: local
-  become: true
   vars_files:
     - var.yml
 
