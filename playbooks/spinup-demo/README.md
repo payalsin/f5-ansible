@@ -15,6 +15,10 @@ Pre-requisites:
 - DNS server is set to BIG-IP DNS Listerner IP
 - DHCP is enabled in vCenter
 - ASM policy is available for export to the BIG-IP (asm_policy.xml)
+- Variable file (var.yml) has most of the input needed to run the playbook
+  - Variables that are not a part of the var.yml are provided as part of the survey through Ansible Tower (Details below)
+  
+** If not using Ansible Tower, the variables that are needed through tower can just be added directly to the variable file (var.yml)
 
 Scenario1: Spin up BIG-IP VE in Vmware
 ----------------------------------
