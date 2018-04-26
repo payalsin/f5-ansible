@@ -1,6 +1,3 @@
-vm_guest_name: "newVM-BIGIP005_7"
-license_key: "DGGLZ-NEHVQ-QKXJR-SBHYT-UCYXZZZ"
-
 username: admin
 password: admin
 
@@ -39,11 +36,6 @@ selfip_information:
 module_provisioning:
  - name: 'asm'
    level: 'nominal'
-
-#VIP information
-vip_name: "LTM2_http_vs"
-vip_port: "80"
-vip_ip: "10.168.68.12"
 
 #Pool memeber information
 pool_members:
