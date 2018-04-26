@@ -45,7 +45,7 @@
     bigip_gtm_pool_member:
      server: "{{ dns_server_IPAddress }}"
      virtual_server: "/Common/{{ vip_name }}"
-     server: "/Common/{{ server_name }}"
+     server_name: "/Common/{{ server_name }}"
      pool: "{{ dns_pool }}"
      type: a
     retries: 5
