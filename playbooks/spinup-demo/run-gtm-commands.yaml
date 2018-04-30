@@ -30,6 +30,9 @@
   hosts: bigip-gtm
   gather_facts: false
 
+  vars_files:
+    - var.yml
+    
   tasks:
 
   - name: Copy file
