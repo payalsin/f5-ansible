@@ -39,7 +39,7 @@
     copy: src='test.sh' dest='/tmp/test.sh'
 
   - name: Execute command
-    command: /usr/local/bin/big3d_install ""{{selfip_information[0].address}}""
+    command: /usr/local/bin/big3d_install "{{selfip_information[0].address}}"
 
   - name: Execute shell
     command: sh /tmp/test.sh
