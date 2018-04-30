@@ -46,8 +46,9 @@ Playbook tasks:
 
 Scenario2: Sync the new BIG-IP LTM to the existing BIG-IP DNS
 -------------------------------------------------------------
-After scenario1 is run and new BIG-IP is spun up, it needs to exchange SSL certs with the BIG-IP DNS in order for them to be able to communicate. Playbook used to accomplish this task run-gtm-commands.yaml
+After scenario1 is run and new BIG-IP is spun up, it needs to exchange SSL certs with the BIG-IP DNS in order for them to be able to communicate. Playbook used to accomplish this task 'run-gtm-commands.yaml'
 
+After running above playbook go to the next step
 Playbook: global_lb.yaml
 
 Variables entered as part of survey using Ansible Tower
