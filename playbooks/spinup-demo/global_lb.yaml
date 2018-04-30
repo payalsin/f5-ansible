@@ -1,3 +1,7 @@
+#Create the new LTM server (ltm2) and assign to existing DNS datacenter
+#BIG-IP DNS now has visibility into all virtual servers on the ltm2, add the ltm2 virtual server to the existing dns pool
+#Disable the virtual server on ltm1
+
 - name: Global LB
   hosts: localhost
   connection: local
@@ -31,7 +35,8 @@
      virtual_server_discovery: enabled
      devices:
        - {'name': 'server_1', 'address': "{{selfip_information[0].address}}"}  #Self-IP of LTM2 from var file
-   
+ 
+  #Wait for 20 seconds for GTM to grab all the configuration from the newly added LTM
   - wait_for:
       timeout: 20
       
@@ -49,6 +54,8 @@
      - server: "/Common/{{ ltm2_server_name }}"
        virtual_server: "/Common/{{ ltm2_vip }}"
 
+  #Disable the Virtual Server on LTM1, this will casue all the traffic to now be directed to LTM2
+  #Since we added LTM2 to the DNS pool in the above step
   - name: Disable Virtual Server
     bigip_virtual_server:
       server: "{{ ltm1_IPAddress }}"
