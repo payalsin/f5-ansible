@@ -7,6 +7,7 @@
 
   tasks:
 
+  #Create shell script to run the bigip_add command
   - name: Create shell script
     blockinfile:
      path: ./test.sh
@@ -19,7 +20,10 @@
         send "default\r"
         expect "*Done*"
         EOF
-
+        
+  #Create ssh config file so that StrictHostKeyChecking is set to no 
+  #For more details on why this is being done:
+  #http://bencane.com/2013/07/22/ssh-disable-host-checking-for-scripts-automation/
   - name: Create config file
     lineinfile:
      dest: ./config
@@ -35,14 +39,18 @@
     
   tasks:
 
+  # Copy the files to the BIG-IP GTM
   - name: Copy file
     copy: src='config' dest='/root/.ssh/config'
 
   - name: Copy file
     copy: src='test.sh' dest='/tmp/test.sh'
 
+  # Execute the bigip_add and big3d_install command
+  - name: Execute shell
+    command: sh /tmp/test.sh
+    
   - name: Execute command
     command: /usr/local/bin/big3d_install "{{selfip_information[0].address}}"
 
-  - name: Execute shell
-    command: sh /tmp/test.sh
+ 
