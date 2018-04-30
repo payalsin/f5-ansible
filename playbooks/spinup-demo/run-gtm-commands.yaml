@@ -1,0 +1,45 @@
+- name: Create shell script
+  hosts: localhost
+  gather_facts: false
+
+  vars_files:
+    - var.yml
+
+  tasks:
+
+  - name: Create shell script
+    blockinfile:
+     path: ./test.sh
+     create: yes
+     block: |
+        #!/bin/bash
+        /usr/bin/expect << EOF
+        spawn /usr/local/bin/bigip_add "{{selfip_information[0].address}}"
+        expect "Password:"
+        send "default\r"
+        expect "*Done*"
+        EOF
+
+  - name: Create config file
+    lineinfile:
+     dest: ./config
+     create: yes
+     line: "StrictHostKeyChecking no"
+
+- name: Run gtm commands
+  hosts: bigip-gtm
+  gather_facts: false
+
+  tasks:
+
+  - name: Copy file
+    copy: src='config' dest='/root/.ssh/config'
+
+  - name: Copy file
+    copy: src='test.sh' dest='/tmp/test.sh'
+
+  - name: Execute command
+    command: /usr/local/bin/big3d_install ""{{selfip_information[0].address}}""
+
+  - name: Execute shell
+    command: sh /tmp/test.sh
