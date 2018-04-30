@@ -1,9 +1,12 @@
 - name: Spin up BIG-IP VE in VMware
   hosts: localhost
   connection: local
+  
+  #Variable file included
   vars_files:
     - var.yml
 
+  #Environment variables defined
   environment:
     F5_USER: "{{ username }}"
     F5_PASSWORD: "{{ password }}"
@@ -17,6 +20,8 @@
   
   tasks:
 
+  #Deploying a BIG-IP VE from a template
+  #Template already present in vCenter before running the playbook
   - name: Deploy BIG-IP VE in vCenter
     vsphere_guest:
       vcenter_hostname: 10.192.73.100
@@ -30,6 +35,7 @@
       #Template already exists in vCenter 
       template_src: "{{ template_src }}"
         
+  #Reconfiguring the network adaptors to assign them to the required port groups 
   - name: Reconfigure BIG-IP VE network adaptors
     vsphere_guest:
       vcenter_hostname: 10.192.73.100
@@ -54,18 +60,24 @@
         network: BlackHole
         network_type: standard
 
+  #Getting the IP address assigned to BIG-IP
+  #IP address is assigned via DHCP when the VE is spun up
   - name: Check for VM info
     command: "/usr/local/bin/govc vm.ip {{ vm_guest_name }}"
     register: govc_vm_info
+    #Looking for the IP till it mathces the DHCP range configured
+    #The VE goes through a couple of iterations before getting assigned the final IP, hence the check is needed
     until: govc_vm_info.stdout.find("10.192") != -1
     retries: 50
     delay: 10
 
+  #Assigning the IP to a variable to use in the reamining playbook
   - name: Assigning IP Address to variable
     set_fact:
      IPAddress: "{{ govc_vm_info['stdout']}}"
  
-  - name: Wait for BIG-IP to be ready
+  #Wait for BIG-IP to boot up completely and be ready to take furthur commands
+  - name: Wait for BIG-IP to boot up completely
     bigip_wait:
      password: admin
      server: "{{ IPAddress }}"
@@ -73,7 +85,9 @@
      validate_certs: false
     delegate_to: localhost
 
-#License
+#License the BIG-IP using a license key
+#This will work only if the BIG-IP has internet connectivity,
+#the BIG-IP needs to be able to reach the F5 license server
   - name: License BIG-IP using a key
     bigip_device_license:
       server: "{{ IPAddress }}"
@@ -84,12 +98,15 @@
       validate_certs: false
     delegate_to: localhost
 
+#Make sure BIG-IP is ready after license is installed
   - name: Wait for BIG-IP to be ready to take configuration
     bigip_wait:
      server: "{{ IPAddress }}"
     delegate_to: localhost
 
-#Provision
+#Provision the BIG-IP with appproriate modules
+#LTM is enabled by default
+#In this example ASM is being enabled
   - name: Provision BIG-IP with appropriate modules
     bigip_provision:
       server: "{{ IPAddress }}"
@@ -98,12 +115,13 @@
     with_items: "{{ module_provisioning }}"
     delegate_to: localhost
 
+#BIG-IP goes through the restart cycle once modules are provisioned, make sure BIG-IP is ready after module provisioning
   - name: Wait for BIG-IP to be ready after provisioning modules
     bigip_wait:
      server: "{{ IPAddress }}"
     delegate_to: localhost
     
-#Onboard
+#Onboard the BIG-IP (NTP/Hostname/SSHD/DNS)
   - name: Configure NTP server on BIG-IP
     bigip_device_ntp:
       server: "{{ IPAddress }}"
@@ -129,7 +147,7 @@
      name_servers: "{{ dns_servers }}"
     delegate_to: localhost
 
-#Network
+#Network the BIG-IP (VLANS/Self-IP configuration)
   - name: Configure VLANs on the BIG-IP
     bigip_vlan:
      server: "{{ IPAddress }}"
@@ -174,8 +192,7 @@
       - type: enable
         asm_policy: Demo
 
-#Create VS/Pool etc
-
+#Create VS/Pool/members
   - name: Create nodes
     bigip_node:
       server: "{{ IPAddress }}"
@@ -204,6 +221,7 @@
     with_items: "{{pool_members}}"
     delegate_to: localhost
 
+  #Attach ASM profile to the virtual server amongst other configurations
   - name: Add Virtual Server
     bigip_virtual_server:
       server: "{{ IPAddress }}"
