@@ -46,11 +46,7 @@ Playbook tasks:
 
 Scenario2: Sync the new BIG-IP LTM to the existing BIG-IP DNS
 -------------------------------------------------------------
-ONE MANUAL STEP: After scenario1 is run and new BIG-IP is spun up, it needs to exchange SSL certs with the BIG-IP DNS in order for them to be able to communicate.
-- Login to the BIG-IP DNS and run the following two commmands:
-   - /usr/local/bin/bigip_add <ltm_selfip>
-   - /usr/local/bin/big3d_install <ltm_selfip>
-- For more details : https://support.f5.com/csp/article/K14495
+After scenario1 is run and new BIG-IP is spun up, it needs to exchange SSL certs with the BIG-IP DNS in order for them to be able to communicate. Playbook used to accomplish this task run-gtm-commands.yaml
 
 Playbook: global_lb.yaml
 
