@@ -22,7 +22,7 @@ Pre-requisites:
 
 Scenario1: Spin up BIG-IP VE in Vmware
 ----------------------------------
-Playbook: spinup_vmware.yaml
+Playbook: 'spinup_vmware.yaml'
 
 Variables entered as part of survey using Ansible Tower
 - Guest name in vcenter (vm_guest_name)
@@ -49,7 +49,7 @@ Scenario2: Sync the new BIG-IP LTM to the existing BIG-IP DNS
 After scenario1 is run and new BIG-IP is spun up, it needs to exchange SSL certs with the BIG-IP DNS in order for them to be able to communicate. Playbook used to accomplish this task 'run-gtm-commands.yaml'
 
 After running above playbook go to the next step
-Playbook: global_lb.yaml
+Playbook: 'global_lb.yaml'
 
 Variables entered as part of survey using Ansible Tower
 - BIG-IP address (ltm1_IPAddress) (BIG-IP already synced with BIG-IP DNS)
