@@ -1,6 +1,0 @@
----
-- name: Configure http service
-  hosts: bigip
-  gather_facts: false
-  roles:
-  - { role: payalsin.bigip-ansible-ha-setup }
