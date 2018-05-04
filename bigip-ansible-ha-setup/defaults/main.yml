@@ -1,0 +1,65 @@
+bigip1_ip: 10.192.xx.xx
+bigip1_username: "admin"
+bigip1_password: "admin"
+
+bigip2_ip: 10.192.xx.xx
+bigip2_username: "admin"
+bigip2_password: "admin"
+
+bigip1_hostname: bigipha1.local
+bigip2_hostname: bigipha2.local
+
+ha_vlan_information:
+- name: "HA_VLAN"
+  id: "3"
+  interface: "2.4"
+
+bigip1_ha_selfip: 
+- name: "HA_SELF-IP"
+  address: "1.1.1.4"
+  netmask: "255.255.255.0"
+  vlan: "{{ha_vlan_information[0]['name']}}"
+
+bigip2_ha_selfip:
+- name: "HA_SELF-IP"
+  address: "1.1.1.5"
+  netmask: "255.255.255.0"
+  vlan: "{{ha_vlan_information[0]['name']}}"
+
+vlan_information:
+- name: "External_VLAN"
+  id: "1195"
+  interface: "2.2"
+- name: "Internal_VLAN"
+  id: "1695"
+  interface: "2.2"
+
+bigip1_selfip_information:
+- name: 'External-SelfIP'
+  address: '10.168.56.10'
+  netmask: '255.255.255.0'
+  vlan: "{{vlan_information[0]['name']}}"
+- name: 'Internal-SelfIP'
+  address: '192.168.56.10'
+  netmask: '255.255.255.0'
+  vlan: "{{vlan_information[1]['name']}}"
+
+floating_selfip_information:
+- name: 'External-Floating-SelfIP'
+  address: '10.168.56.15'
+  netmask: '255.255.255.0'
+  vlan: "{{vlan_information[0]['name']}}"
+- name: 'Internal-Floating-SelfIP'
+  address: '192.168.56.15'
+  netmask: '255.255.255.0'
+  vlan: "{{vlan_information[1]['name']}}"
+
+bigip2_selfip_information:
+- name: 'External-SelfIP'
+  address: '10.168.56.11'
+  netmask: '255.255.255.0'
+  vlan: "{{vlan_information[0]['name']}}"
+- name: 'Internal-SelfIP'
+  address: '192.168.56.11'
+  netmask: '255.255.255.0'
+  vlan: "{{vlan_information[1]['name']}}"

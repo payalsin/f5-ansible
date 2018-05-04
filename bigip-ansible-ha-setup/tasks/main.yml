@@ -1,0 +1,138 @@
+---
+  - name: Configure BIG-IP1 hostname
+    bigip_hostname:
+      server: "{{bigip1_ip}}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      validate_certs: False
+      hostname:  "{{bigip1_hostname}}"
+    delegate_to: localhost
+
+  - name: Configure BIG-IP2 hostname
+    bigip_hostname:
+      server: "{{bigip2_ip}}"
+      user: "{{ bigip2_username }}"
+      password: "{{ bigip2_password }}"
+      validate_certs: False
+      hostname:  "{{bigip2_hostname}}"
+    delegate_to: localhost
+
+  - name: Add HA VLAN(s) on BIG-IP1
+    bigip_vlan:
+      server: "{{bigip1_ip}}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      name: "{{item.name}}"
+      tag: "{{item.id}}"
+      tagged_interfaces:
+      - "{{item.interface}}"
+      validate_certs: "no"
+    with_items: "{{ha_vlan_information}}"
+
+  - name: Add HA VLAN(s) on BIG-IP2
+    bigip_vlan:
+      server: "{{bigip2_ip}}"
+      user: "{{ bigip2_username }}"
+      password: "{{ bigip2_password }}"
+      name: "{{item.name}}"
+      tag: "{{item.id}}"
+      tagged_interfaces:
+      - "{{item.interface}}"
+      validate_certs: "no"
+    with_items: "{{ha_vlan_information}}"
+
+  - name: Add HA SELF-IP(s) on BIG-IP1
+    bigip_selfip:
+     server: "{{bigip1_ip}}"
+     user: "{{ bigip1_username }}"
+     password: "{{ bigip1_password }}"
+     name: "{{item.name}}"
+     address: "{{item.address}}"
+     netmask: "{{item.netmask}}"
+     vlan: "{{item.vlan}}"
+     validate_certs: "no"
+    with_items: "{{ bigip1_ha_selfip }}"
+
+  - name: Add HA SELF-IP(s) on BIG-IP2
+    bigip_selfip:
+     server: "{{bigip2_ip}}"
+     user: "{{ bigip2_username }}"
+     password: "{{ bigip2_password }}"
+     name: "{{item.name}}"
+     address: "{{item.address}}"
+     netmask: "{{item.netmask}}"
+     vlan: "{{item.vlan}}"
+     validate_certs: "no"
+    with_items: "{{ bigip2_ha_selfip }}"
+
+  - name: Config Sync/unicast/mirroring address - BIGIP1
+    bigip_device_connectivity:
+      server: "{{bigip1_ip}}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      config_sync_ip: "{{bigip1_ha_selfip[0]['address']}}"
+      mirror_primary_address: "{{bigip1_ha_selfip[0]['address']}}"
+      unicast_failover:
+      - address: "{{bigip1_ha_selfip[0]['address']}}"
+      - address: "{{bigip1_ip}}"
+      validate_certs: False
+    delegate_to: localhost
+
+  - name: Config Sync/unicast/mirroring address - BIGIP2
+    bigip_device_connectivity:
+      server: "{{bigip2_ip}}"
+      user: "{{ bigip2_username }}"
+      password: "{{ bigip2_password }}"
+      config_sync_ip: "{{bigip2_ha_selfip[0]['address']}}"
+      mirror_primary_address: "{{bigip2_ha_selfip[0]['address']}}"
+      unicast_failover:
+      - address: "{{bigip2_ha_selfip[0]['address']}}"
+      - address: "{{bigip2_ip}}"
+      validate_certs: False
+    delegate_to: localhost
+
+  - name: Device trust
+    bigip_device_trust:
+      server: "{{bigip1_ip}}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      peer_server: "{{ bigip2_ip }}"
+      peer_hostname: "{{ bigip2_hostname }}"
+      peer_user: "{{ bigip2_username }}"
+      peer_password: "{{ bigip2_password }}"
+      validate_certs: False
+    delegate_to: localhost
+
+  - name: Add Device Group
+    bigip_device_group:
+      server: "{{bigip1_ip}}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      name: "deviceGrp"
+      auto_sync: yes
+      type: "sync-failover"
+      validate_certs: False
+    delegate_to: localhost
+
+  - name: Add members to the device group
+    bigip_device_group_member:
+      server: "{{bigip1_ip}}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      device_group: "deviceGrp"
+      name: "{{ item }}"
+      validate_certs: False
+    with_items:
+      - "{{bigip1_hostname}}"
+      - "{{bigip2_hostname}}"
+    delegate_to: localhost
+
+  - name: Perform a config sync
+    bigip_configsync_action:
+      server: "{{bigip1_ip}}"
+      user: "{{ bigip1_username }}"
+      password: "{{ bigip1_password }}"
+      device_group: "deviceGrp"
+      sync_device_to_group: yes
+      validate_certs: False
+    delegate_to: localhost
