@@ -12,9 +12,9 @@
     F5_PASSWORD: "{{ password }}"
     F5_SERVER_PORT: "443"
     F5_VALIDATE_CERTS: "False"
-    GOVC_URL: "https://10.192.73.100/sdk"
+    GOVC_URL: "https://10.192.73.***/sdk"
     GOVC_USERNAME: "root"
-    GOVC_PASSWORD: "vmware"
+    GOVC_PASSWORD: "*****"
     GOVC_INSECURE: "1"
     GOVC_DATACENTER: "F5 BD Lab"
   
@@ -24,12 +24,12 @@
   #Template already present in vCenter before running the playbook
   - name: Deploy BIG-IP VE in vCenter
     vsphere_guest:
-      vcenter_hostname: 10.192.73.100
+      vcenter_hostname: 10.192.73.***
       esxi:
         datacenter: F5 BD Lab
         hostname: 10.192.73.22
       username: root
-      password: vmware
+      password: *****
       guest: "{{ vm_guest_name }}"
       from_template: yes
       #Template already exists in vCenter 
