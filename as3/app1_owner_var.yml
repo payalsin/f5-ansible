@@ -1,9 +1,14 @@
 uri: /mgmt/shared/appsvcs/declare
 method: POST
 
-tenant_name: "tower_tenant_test"
-application_name: "tower_app_Test"
-pool_name: "tower_pool_Test"
+tenant_name: "Customer1"
+application_name: "Customer1_App"
+pool_name: "customer1_Pool"
 
-virtual_address: "10.192.68.99"
-hasMoreVirtuals: "0"
+virtual_address: "10.192.98.70"
+hasMoreVirtuals: "1"
+virtual_servers:
+- name: "VS2"
+  ip: "10.168.98.65"
+- name: "VS3"
+  ip: "10.168.98.66"
