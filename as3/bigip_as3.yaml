@@ -11,10 +11,10 @@
 
   - name: Run command
     uri:
-       url: https://{{inventory_hostname}}/mgmt/shared/appsvcs/declare
-       method: POST
-       user: admin
-       password: admin
+       url: https://{{inventory_hostname}}/{{uri}}
+       method: {{method}}
+       #user: admin
+       #password: admin
        validate_certs: no
        body: "{{(lookup('file','http_as3.json'))}}"
        body_format: json
