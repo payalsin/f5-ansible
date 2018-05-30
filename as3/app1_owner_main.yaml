@@ -1,0 +1,20 @@
+---
+- name: Create JSON Payload
+  hosts: bigips
+  gather_facts: false
+  connection: local
+
+  tasks:
+
+  - name: Build JSON payload
+    template: src=app1_onwer.j2 dest=app1_owner.json
+
+  - name: Run command
+    uri:
+       url: "https://{{inventory_hostname}}{{uri}}"
+       method: "{{method}}"
+       user: "admin"
+       password: "admin"
+       validate_certs: no
+       body: "{{(lookup('file','app1_owner.json'))}}"
+       body_format: json
