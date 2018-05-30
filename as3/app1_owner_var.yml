@@ -1,4 +1,4 @@
-uri: /mgmt/shared/appsvcs/declare/tower_tenant_test
+uri: /mgmt/shared/appsvcs/declare
 method: POST
 
 tenant_name: "tower_tenant_test"
