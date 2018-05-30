@@ -21,6 +21,17 @@
                  ],
                  "pool": "{{pool_name}}"
                  },
+                 {% if hasMore==1 %}
+                 {% for virtual in virtual_servers %}
+                 "{{virtual.name}}": {
+                   "class": "Service_HTTP",
+                   "virtualAddresses": [
+                     "{{virtual.ip}}"
+                 ],
+                  "pool": "{{pool_name}}",
+                 },
+                 {% endfor %}
+                 {% endif %}
                  "{{pool_name}}": {
                      "class": "Pool",
                      "monitors": [
