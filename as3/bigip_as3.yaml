@@ -1,0 +1,23 @@
+---
+- name: L4-L4 configuration on BIG-IP
+  hosts: bigips
+  gather_facts: false
+  connection: local
+
+  vars_files:
+   - as3_var.yml
+
+  tasks:
+
+  - name: Build JSON payload
+    template: src=http_as3.j2 dest=http_as3.json
+
+  - name: Run command
+    uri:
+       url: https://10.192.73.253/mgmt/shared/appsvcs/declare
+       method: POST
+       user: admin
+       password: admin
+       validate_certs: no
+       body: "{{(lookup('file','http_as3.json'))}}"
+       body_format: json
