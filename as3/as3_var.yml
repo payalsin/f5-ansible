@@ -1,0 +1,10 @@
+pool_members:
+- ip: "192.168.68.141"
+- ip: "192.168.68.142"
+
+virtual_address: "10.192.68.90"
+
+tenant_name: "Ansible_Tenant_Test"
+application_name: "Ansible_App_Test"
+virtual_server_name: "Ansible_VirtualS_Test"
+pool_name: "Ansible_Pool_Test"
