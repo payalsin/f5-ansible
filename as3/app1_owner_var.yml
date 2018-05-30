@@ -6,4 +6,4 @@ application_name: "tower_app_Test"
 pool_name: "tower_pool_Test"
 
 virtual_address: "10.192.68.99"
-hasMoreVirtuals=0
+hasMoreVirtual:0
