@@ -11,7 +11,7 @@
 
   - name: Run command
     uri:
-       url: https://{{inventory_hostname}}/"{{uri}}"
+       url: "https://{{inventory_hostname}}{{uri}}"
        method: "{{method}}"
        #user: admin
        #password: admin
