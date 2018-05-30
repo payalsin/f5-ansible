@@ -7,7 +7,7 @@
   tasks:
 
   - name: Build JSON payload
-    template: src=http_as3.j2 dest=http_as3.json
+    template: src=app1_owner.j2 dest=app1_owner.json
 
   - name: Run command
     uri:
@@ -16,5 +16,5 @@
        user: "admin"
        password: "admin"
        validate_certs: no
-       body: "{{(lookup('file','http_as3.json'))}}"
+       body: "{{(lookup('file','app1_owner.json'))}}"
        body_format: json
