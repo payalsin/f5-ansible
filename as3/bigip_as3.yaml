@@ -1,24 +1,14 @@
 ---
 - name: Create JSON Payload
-  hosts: localhost
+  hosts: bigips
   gather_facts: false
   connection: local
-
-  vars_files:
-   - as3_var.yml
 
   tasks:
 
   - name: Build JSON payload
     template: src=http_as3.j2 dest=http_as3.json
 
-- name: L4-L7 configuration on BIG-IP
-  hosts: bigips
-  gather_facts: false
-  connection: local
-  
-  tasks:
-  
   - name: Run command
     uri:
        url: https://{{inventory_hostname}}/mgmt/shared/appsvcs/declare
