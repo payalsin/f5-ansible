@@ -43,6 +43,7 @@
                              "serverAddresses": [
                                  {% for member in pool_members %}
                                  "{{member.ip}}",
+                                 "{{member.enable}}"
                                  {% endfor %}
                              ]
                          }
