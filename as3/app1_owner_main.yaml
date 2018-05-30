@@ -4,6 +4,9 @@
   gather_facts: false
   connection: local
 
+  vars_files:
+   - app1_onwer_var.yml
+   
   tasks:
 
   - name: Build JSON payload
