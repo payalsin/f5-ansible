@@ -11,8 +11,8 @@
 
   - name: Run command
     uri:
-       url: https://{{inventory_hostname}}/{{uri}}
-       method: {{method}}
+       url: https://{{inventory_hostname}}/"{{uri}}"
+       method: "{{method}}"
        #user: admin
        #password: admin
        validate_certs: no
