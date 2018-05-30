@@ -17,6 +17,8 @@
   gather_facts: false
   connection: local
   
+  tasks:
+  
   - name: Run command
     uri:
        url: https://{{inventory_hostname}}/mgmt/shared/appsvcs/declare
