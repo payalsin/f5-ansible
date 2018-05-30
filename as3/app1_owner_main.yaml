@@ -10,7 +10,7 @@
   tasks:
 
   - name: Build JSON payload
-    template: src=app1_onwer.j2 dest=app1_owner.json
+    template: src=app1_owner.j2 dest=app1_owner.json
 
   - name: Run command
     uri:
