@@ -1,6 +1,6 @@
 ---
-- name: L4-L4 configuration on BIG-IP
-  hosts: bigips
+- name: Create JSON Payload
+  hosts: localhost
   gather_facts: false
   connection: local
 
@@ -12,9 +12,14 @@
   - name: Build JSON payload
     template: src=http_as3.j2 dest=http_as3.json
 
+- name: L4-L7 configuration on BIG-IP
+  hosts: bigips
+  gather_facts: false
+  connection: local
+  
   - name: Run command
     uri:
-       url: https://10.192.73.253/mgmt/shared/appsvcs/declare
+       url: https://{{inventory_hostname}}/mgmt/shared/appsvcs/declare
        method: POST
        user: admin
        password: admin
