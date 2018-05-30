@@ -13,8 +13,8 @@
     uri:
        url: "https://{{inventory_hostname}}{{uri}}"
        method: "{{method}}"
-       #user: admin
-       #password: admin
+       user: {{inventory_username}}
+       password: {{inventory_password}}
        validate_certs: no
        body: "{{(lookup('file','http_as3.json'))}}"
        body_format: json
