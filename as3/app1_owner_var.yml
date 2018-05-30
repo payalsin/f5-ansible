@@ -3,7 +3,7 @@ method: POST
 
 tenant_name: "Customer1"
 application_name: "Customer1_App"
-pool_name: "customer1_Pool"
+pool_name: "Customer1_Pool"
 
 virtual_address: "10.192.98.70"
 hasMoreVirtuals: "1"
