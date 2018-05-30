@@ -5,7 +5,7 @@
   connection: local
 
   vars_files:
-   - app1_onwer_var.yml
+   - app1_owner_var.yml
    
   tasks:
 
