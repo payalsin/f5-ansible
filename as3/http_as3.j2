@@ -21,7 +21,7 @@
                  ],
                  "pool": "{{pool_name}}"
                  },
-                 {% if hasMore==1 %}
+                 {% if hasMoreVirtuals==1 %}
                  {% for virtual in virtual_servers %}
                  "{{virtual.name}}": {
                    "class": "Service_HTTP",
