@@ -1,10 +1,9 @@
-pool_members:
-- ip: "192.168.68.151"
-- ip: "192.168.68.152"
+uri: /mgmt/shared/appsvcs/declare/tower_tenant_test
+method: POST
 
-virtual_address: "10.192.68.99"
-
-hasMoreVirtuals=0
 tenant_name: "tower_tenant_test"
 application_name: "tower_app_Test"
 pool_name: "tower_pool_Test"
+
+virtual_address: "10.192.68.99"
+hasMoreVirtuals=0
