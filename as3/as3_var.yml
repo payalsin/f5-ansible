@@ -2,7 +2,7 @@ pool_members:
 - ip: "192.168.68.141"
 - ip: "192.168.68.142"
 
-virtual_address: "10.192.68.90"
+virtual_address: "10.192.68.91"
 
 tenant_name: "Ansible_Tenant_Test"
 application_name: "Ansible_App_Test"
