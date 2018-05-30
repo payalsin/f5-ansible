@@ -37,17 +37,17 @@
                      "monitors": [
                          "http"
                      ],
-                     "members": [
-                         {
-                             "servicePort": 80,
-                             "serverAddresses": [
-                                 {% for member in pool_members %}
-                                 "{{member.ip}}",
-                                 {% endfor %}
-                             ],
-                             "enable": {{member_status}}
-                         }
-                     ]
+                   "members": [
+                    {% for member in pool_members %}
+                      {
+                         "enable": {{member.status}},
+                         "servicePort": {{member.port}},
+                         "serverAddresses": [
+                              "{{member.ip}}"
+                         ]
+                      },
+                    {% endfor %}
+                    ]
                  }
              }
          }
