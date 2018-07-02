@@ -1,0 +1,17 @@
+---
+- hosts: localhost
+  tasks:
+
+  - name: deploy big-ip using ovftool
+    command: bash deploy_ova.bash
+
+  - name: PowerOn VM
+    vsphere_guest:
+      vcenter_hostname: 10.192.73.xxx
+      esxi:
+        datacenter: F5 BD Lab
+        hostname: 10.192.73.xx
+      username: root
+      password: ****
+      guest: "TestingOVFTool"
+      state: powered_on
