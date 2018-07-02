@@ -1,0 +1,35 @@
+---
+- name: Licensing BIG-IQ
+  hosts: localhost
+  gather_facts: false
+  connection: localhost
+
+  tasks:
+
+  - name: Add the Utility license key to the BIG-IQ
+    bigiq_utility_license:
+     license_key: xxxxx-xxxxx-xxxxx-xxxxx-xxxxxx
+     accept_eula: yes
+     password: admin
+     #BIG-IQ server IP
+     server: 10.192.74.xxx
+     state: present
+     user: admin
+     validate_certs: false
+
+  - name: License the BIG-IP device using BIG-IQ CM
+    bigiq_utility_license_assignment:
+     key: xxxxx-xxxxx-xxxxx-xxxxx-xxxxxx
+     offering: F5-BIG-MSP-APM-M-1G
+     #BIG-IP address
+     device: 10.192.74.xxx
+     managed: no
+     device_username: admin
+     device_password: admin
+     state: present
+     provider:
+      password: admin
+      #BIG-IQ address
+      server: 10.192.74.xxx
+      user: admin
+     validate_certs: false
