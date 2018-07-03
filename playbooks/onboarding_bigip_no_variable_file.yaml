@@ -1,0 +1,38 @@
+- name: Onboard BIG-IP
+  hosts: localhost
+  connection: local
+  
+  #Environment variables defined
+  environment:
+    F5_USER: "admin"
+    F5_PASSWORD: "admin"
+    F5_SERVER_PORT: "443"
+    F5_VALIDATE_CERTS: "False"
+  
+  tasks:
+ 
+  #Onboard the BIG-IP (NTP/Hostname/SSHD/DNS)
+  - name: Configure NTP server on BIG-IP
+    bigip_device_ntp:
+      server: "<<bigip_ip_address>>"
+      ntp_servers: "172.27.1.1"
+    delegate_to: localhost
+
+  - name: Configure BIG-IP hostname
+    bigip_hostname:
+      server: "<<bigip_ip_address>>"
+      hostname: "bigip.test.com"
+    delegate_to: localhost
+
+  - name: Manage SSHD setting on BIG-IP
+    bigip_device_sshd:
+      server: "<<bigip_ip_address>>"
+      banner: "enabled"
+      banner_text: "Welcome to BIG-IP"
+    delegate_to: localhost
+
+  - name: Manage BIG-IP DNS settings
+    bigip_device_dns:
+     server: "<<bigip_ip_address>>"
+     name_servers: "8.8.8.8"
+    delegate_to: localhost
