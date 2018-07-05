@@ -1,0 +1,80 @@
+<!-- Physical or Virtual BIG-IP -->
+<!-- HA or Single mode -->
+<!-- One physical connection of BIG-IP to APIC -->
+<!-- Two logical connection(s) on APIC (2 ARM mode service graph) -->
+
+{% if device_type=='physical' %}
+<vnsLDevVip trunking="no" svcType="ADC" name="{{logicalDeviceCluster_name}}" mode="legacy-Mode" managed="no" isCopy="no" funcType="GoTo" dn="uni/tn-{{tenant_name}}/lDevVip-{{logicalDeviceCluster_name}}" devtype="PHYSICAL" contextAware="single-Context">
+{% endif %}
+
+{% if device_type=='virtual' %}
+<vnsLDevVip contextAware="single-Context" devtype="VIRTUAL" dn="uni/tn-{{tenant_name}}/lDevVip-{{logicalDeviceCluster_name}}" funcType="GoTo" isCopy="no" managed="no" mode="legacy-Mode" name="{{logicalDeviceCluster_name}}" promMode="no" svcType="ADC" trunking="no">
+{% endif %}
+
+   {% if device_type=='physical' %}
+   <vnsRsALDevToPhysDomP tDn="uni/phys-{{physical_domain_name}}" />
+   {% endif %}
+   
+   {% if device_type=='virtual' %}
+   <vnsRsALDevToDomP switchingMode="native" tDn="uni/vmmp-VMware/dom-{{vmm_domain_name}}" />
+   {% endif %}
+   
+   {% if device_type=='physical' %}
+   <vnsCDev name="Device1">
+	  <vnsCIf name="Device1_IntExt" >
+		 <vnsRsCIfPathAtt tDn="topology/{{device1_interface1_connectionPath}}" />
+	  </vnsCIf>
+   </vnsCDev>
+     {% if mode=='HA' %}
+	   <vnsCDev name="Device2">
+		  <vnsCIf name="Device2_IntExt" >
+			 <vnsRsCIfPathAtt tDn="topology/{{device2_interface1_connectionPath}}" />
+		  </vnsCIf>
+	   </vnsCDev>
+	 {% endif %}
+   {% endif %}
+   
+   {% if device_type=='virtual' %}
+   <vnsCDev name="Device1" vcenterName="{{vmm_domain_name}}" vmName="{{device1_vm_name}}">
+      <vnsCIf name="Internal" vnicName="{{ldev_int_interface_map_network_adaptor}}" />
+      <vnsCIf name="External" vnicName="{{ldev_ext_interface_map_network_adaptor}}" />
+   </vnsCDev>
+    {% if mode=='HA' %}
+	 <vnsCDev name="Device2" vcenterName="{{vmm_domain_name}}" vmName="{{device2_vm_name}}">
+      <vnsCIf name="Internal" vnicName="{{ldev_int_interface_map_network_adaptor}}" />
+      <vnsCIf name="External" vnicName="{{ldev_ext_interface_map_network_adaptor}}" />
+   </vnsCDev>
+	{% endif %}
+   {% endif %}
+   
+   {% if device_type=='physical' %}
+   <vnsLIf name="External" encap="vlan-{{consumer_vlan}}">
+      <vnsRsCIfAttN tDn="uni/tn-{{tenant_name}}/lDevVip-{{logicalDeviceCluster_name}}/cDev-Device1/cIf-[Device1_IntExt]" />
+	  {% if mode=='HA' %}
+      <vnsRsCIfAttN tDn="uni/tn-{{tenant_name}}/lDevVip-{{logicalDeviceCluster_name}}/cDev-Device2/cIf-[Device2_IntExt]" />
+	  {% endif %}
+   </vnsLIf>
+   <vnsLIf name="Internal" encap="vlan-{{provider_vlan}}">
+      <vnsRsCIfAttN tDn="uni/tn-{{tenant_name}}/lDevVip-{{logicalDeviceCluster_name}}/cDev-Device1/cIf-[Device1_IntExt]" />
+	  {% if mode=='HA' %}
+      <vnsRsCIfAttN tDn="uni/tn-{{tenant_name}}/lDevVip-{{logicalDeviceCluster_name}}/cDev-Device2/cIf-[Device2_IntExt]" />
+	  {% endif %}
+   </vnsLIf>
+   {% endif %}
+   
+   {% if device_type=='virtual' %}
+   <vnsLIf encap="unknown" name="Internal" >
+      <vnsRsCIfAttN tDn="uni/tn-{{tenant_name}}/lDevVip-{{logicalDeviceCluster_name}}/cDev-Device1/cIf-[Internal]" />
+	  {% if mode=='HA' %}
+	  <vnsRsCIfAttN tDn="uni/tn-{{tenant_name}}/lDevVip-{{logicalDeviceCluster_name}}/cDev-Device2/cIf-[Internal]" />
+	  {% endif %}
+   </vnsLIf>
+   <vnsLIf encap="unknown" name="External" >
+      <vnsRsCIfAttN  tDn="uni/tn-{{tenant_name}}/lDevVip-{{logicalDeviceCluster_name}}/cDev-Device1/cIf-[External]" />
+	  {% if mode=='HA' %}
+	  <vnsRsCIfAttN tDn="uni/tn-{{tenant_name}}/lDevVip-{{logicalDeviceCluster_name}}/cDev-Device2/cIf-[External]" />
+	  {% endif %}
+   </vnsLIf>
+   {% endif %}
+   
+</vnsLDevVip>

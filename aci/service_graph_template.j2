@@ -1,0 +1,25 @@
+<vnsAbsGraph uiTemplateType="UNSPECIFIED" ownerTag="" ownerKey="" name="{{SGtemplate_name}}" dn="uni/tn-{{tenant_name}}/AbsGraph-{{SGtemplate_name}}" descr="">
+   <vnsAbsTermNodeCon ownerTag="" ownerKey="" name="T1" descr="">
+      <vnsAbsTermConn ownerTag="" ownerKey="" name="1" descr="" attNotify="no" />
+      <vnsInTerm name="" descr="" />
+      <vnsOutTerm name="" descr="" />
+   </vnsAbsTermNodeCon>
+   <vnsAbsTermNodeProv ownerTag="" ownerKey="" name="T2" descr="">
+      <vnsAbsTermConn ownerTag="" ownerKey="" name="1" descr="" attNotify="no" />
+      <vnsInTerm name="" descr="" />
+      <vnsOutTerm name="" descr="" />
+   </vnsAbsTermNodeProv>
+   <vnsAbsConnection ownerTag="" ownerKey="" name="C1" descr="" unicastRoute="yes" directConnect="no" connType="external" connDir="provider" adjType="L2">
+      <vnsRsAbsConnectionConns tDn="uni/tn-{{tenant_name}}/AbsGraph-{{SGtemplate_name}}/AbsNode-N1/AbsFConn-consumer" />
+      <vnsRsAbsConnectionConns tDn="uni/tn-{{tenant_name}}/AbsGraph-{{SGtemplate_name}}/AbsTermNodeCon-T1/AbsTConn" />
+   </vnsAbsConnection>
+   <vnsAbsConnection ownerTag="" ownerKey="" name="C2" descr="" unicastRoute="yes" directConnect="no" connType="external" connDir="provider" adjType="L2">
+      <vnsRsAbsConnectionConns tDn="uni/tn-{{tenant_name}}/AbsGraph-{{SGtemplate_name}}/AbsTermNodeProv-T2/AbsTConn" />
+      <vnsRsAbsConnectionConns tDn="uni/tn-{{tenant_name}}/AbsGraph-{{SGtemplate_name}}/AbsNode-N1/AbsFConn-provider" />
+   </vnsAbsConnection>
+   <vnsAbsNode ownerTag="" ownerKey="" name="N1" descr="" shareEncap="no" sequenceNumber="0" routingMode="unspecified" managed="no" isCopy="no" funcType="GoTo" funcTemplateType="ADC_TWO_ARM">
+      <vnsAbsFuncConn ownerTag="" ownerKey="" name="consumer" descr="" attNotify="no" />
+      <vnsAbsFuncConn ownerTag="" ownerKey="" name="provider" descr="" attNotify="no" />
+      <vnsRsNodeToLDev tDn="uni/tn-{{tenant_name}}/lDevVip-{{logicalDeviceCluster_name}}" />
+   </vnsAbsNode>
+</vnsAbsGraph>

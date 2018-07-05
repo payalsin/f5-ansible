@@ -1,0 +1,11 @@
+<vnsLDevCtx nodeNameOrLbl="N1" name="" graphNameOrLbl="{{SGtemplate_name}}" dn="uni/tn-{{tenant_name}}/ldevCtx-c-{{contract_name}}-g-{{SGtemplate_name}}-n-N1" ctrctNameOrLbl="{{contract_name}}">
+   <vnsRsLDevCtxToLDev tDn="uni/tn-{{tenant_name}}/lDevVip-{{logicalDeviceCluster_name}}" />
+   <vnsLIfCtx permitLog="no" connNameOrLbl="provider">
+      <vnsRsLIfCtxToBD tDn="uni/tn-{{tenant_name}}/BD-{{providerBD_name}}" />
+      <vnsRsLIfCtxToLIf tDn="uni/tn-{{tenant_name}}/lDevVip-{{logicalDeviceCluster_name}}/lIf-Internal" />
+   </vnsLIfCtx>
+   <vnsLIfCtx permitLog="no" connNameOrLbl="consumer">
+      <vnsRsLIfCtxToBD tDn="uni/tn-{{tenant_name}}/BD-{{consumerBD_name}}" />
+      <vnsRsLIfCtxToLIf tDn="uni/tn-{{tenant_name}}/lDevVip-{{logicalDeviceCluster_name}}/lIf-External" />
+   </vnsLIfCtx>
+</vnsLDevCtx>

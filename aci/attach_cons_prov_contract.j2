@@ -1,0 +1,8 @@
+<fvAp prio="unspecified" ownerTag="" ownerKey="" name="{{appProfile_name}}" dn="uni/tn-{{tenant_name}}/ap-{{appProfile_name}}" descr="">
+   <fvAEPg prio="unspecified" name="{{providerEPG_name}}" descr="" prefGrMemb="exclude" pcEnfPref="unenforced" matchT="AtleastOne" isAttrBasedEPg="no" fwdCtrl="">
+      <fvRsProv prio="unspecified" matchT="AtleastOne" tnVzBrCPName="{{contract_name}}" />
+   </fvAEPg>
+   <fvAEPg prio="unspecified" name="{{consumerEPG_name}}" descr="" prefGrMemb="exclude" pcEnfPref="unenforced" matchT="AtleastOne" isAttrBasedEPg="no" fwdCtrl="">
+      <fvRsCons prio="unspecified" tnVzBrCPName="{{contract_name}}" />
+   </fvAEPg>
+</fvAp>
