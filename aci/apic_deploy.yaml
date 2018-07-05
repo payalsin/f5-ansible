@@ -11,12 +11,12 @@
   - name: Create XML POSTS from templates
     template: src={{ item.src }} dest={{ item.dest }}
     with_items:
-      - { src: 'unManagedMode_posts/combined_ldev.j2',             dest: 'unManagedMode_posts/combined_ldev.xml' }
-      - { src: 'unManagedMode_posts/contract.j2',                  dest: 'unManagedMode_posts/contract.xml' }
-      - { src: 'unManagedMode_posts/service_graph_template.j2',    dest: 'unManagedMode_posts/service_graph_template.xml'}
-      - { src: 'unManagedMode_posts/deviceSelectionPolicy.j2',     dest: 'unManagedMode_posts/deviceSelectionPolicy.xml'}
-      - { src: 'unManagedMode_posts/apply_graph.j2',               dest: 'unManagedMode_posts/apply_graph.xml'}
-      - { src: 'unManagedMode_posts/attach_cons_prov_contract.j2', dest: 'unManagedMode_posts/attach_cons_prov_contract.xml'}
+      - { src: 'combined_ldev.j2',             dest: 'combined_ldev.xml' }
+      - { src: 'contract.j2',                  dest: 'unManagedMode_posts/contract.xml' }
+      - { src: 'service_graph_template.j2',    dest: 'unManagedMode_posts/service_graph_template.xml'}
+      - { src: 'deviceSelectionPolicy.j2',     dest: 'unManagedMode_posts/deviceSelectionPolicy.xml'}
+      - { src: 'apply_graph.j2',               dest: 'unManagedMode_posts/apply_graph.xml'}
+      - { src: 'attach_cons_prov_contract.j2', dest: 'unManagedMode_posts/attach_cons_prov_contract.xml'}
 
   - name: Execute POSTS
     aci_rest:
@@ -28,9 +28,9 @@
       password: cisco123
       validate_certs: "false"
     with_items:
-     - "unManagedMode_posts/combined_ldev.xml"
-     - "unManagedMode_posts/contract.xml"
-     - "unManagedMode_posts/service_graph_template.xml"
-     - "unManagedMode_posts/deviceSelectionPolicy.xml"
-     - "unManagedMode_posts/apply_graph.xml"
-     - "unManagedMode_posts/attach_cons_prov_contract.xml"
+     - "combined_ldev.xml"
+     - "contract.xml"
+     - "service_graph_template.xml"
+     - "deviceSelectionPolicy.xml"
+     - "apply_graph.xml"
+     - "attach_cons_prov_contract.xml"
