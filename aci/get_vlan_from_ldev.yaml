@@ -1,4 +1,4 @@
-- name: ACI Setup
+- name: ACI 
   hosts: localhost
   connection: local
   gather_facts: false
@@ -10,11 +10,11 @@
    
   tasks:
 
-  - name: Deploy a tenant and private network
+  - name: Get VLAN information from a Physical Logical Device Cluster
     aci_rest:
       action: "get"
-      uri: "/api/node/mo/uni/tn-{{tenant_name}}/lDevVip-{{ldev_name}}/{{lIf_name}}.json?"
-      #Example: uri: "/api/node/mo/uni/tn-Test_aci_posts/lDevVip-LDC_BIGIP_VE/lIf-External.json?"
+      uri: "/api/node/mo/uni/tn-{{tenant_name}}/lDevVip-{{ldev_name}}.json?query-target=subtree&target-subtree-class=vnsLIf"
+      #Example: uri: "/api/node/mo/uni/tn-Test_aci_posts/lDevVip-LDC_BIGIP_VE.json?query-target=subtree&target-subtree-class=vnsLIf"
       host: 10.192.73.30
       username: admin
       password: cisco123
@@ -24,5 +24,8 @@
   - name: debug
     debug: msg="{{vlan}}"
 
+  - name: debug
+    debug: msg="{{(vlan.imdata[0]['vnsLIf']['attributes']['encap']).split('-')[1]}}"
+    
   - name: debug
     debug: msg="{{(vlan.imdata[0]['vnsLIf']['attributes']['encap']).split('-')[1]}}"
