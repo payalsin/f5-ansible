@@ -1,0 +1,36 @@
+- name: ACI Setup
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - aci_unmanaged_vars_combined_ldev.yml
+
+  tasks:
+
+  - name: Create XML POSTS from templates
+    template: src={{ item.src }} dest={{ item.dest }}
+    with_items:
+      - { src: 'unManagedMode_posts/combined_ldev.j2',             dest: 'unManagedMode_posts/combined_ldev.xml' }
+      - { src: 'unManagedMode_posts/contract.j2',                  dest: 'unManagedMode_posts/contract.xml' }
+      - { src: 'unManagedMode_posts/service_graph_template.j2',    dest: 'unManagedMode_posts/service_graph_template.xml'}
+      - { src: 'unManagedMode_posts/deviceSelectionPolicy.j2',     dest: 'unManagedMode_posts/deviceSelectionPolicy.xml'}
+      - { src: 'unManagedMode_posts/apply_graph.j2',               dest: 'unManagedMode_posts/apply_graph.xml'}
+      - { src: 'unManagedMode_posts/attach_cons_prov_contract.j2', dest: 'unManagedMode_posts/attach_cons_prov_contract.xml'}
+
+  - name: Execute POSTS
+    aci_rest:
+      action: "post"
+      uri: "/api/node/mo/uni/tn-{{tenant_name}}.xml"
+      config_file: "{{ item }}"
+      host: "{{inventory_hostname}}"
+      username: admin
+      password: cisco123
+      validate_certs: "false"
+    with_items:
+     - "unManagedMode_posts/combined_ldev.xml"
+     - "unManagedMode_posts/contract.xml"
+     - "unManagedMode_posts/service_graph_template.xml"
+     - "unManagedMode_posts/deviceSelectionPolicy.xml"
+     - "unManagedMode_posts/apply_graph.xml"
+     - "unManagedMode_posts/attach_cons_prov_contract.xml"
