@@ -1,0 +1,28 @@
+- name: ACI Setup
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+   tenant_name: 'Test_aci_posts'
+   ldev_name: 'LDC_BIGIP_VE'
+   lIf_name: 'lIf-External'
+   
+  tasks:
+
+  - name: Deploy a tenant and private network
+    aci_rest:
+      action: "get"
+      uri: "/api/node/mo/uni/tn-{{tenant_name}}/lDevVip-{{ldev_name}}/{{lIf_name}}.json?"
+      #Example: uri: "/api/node/mo/uni/tn-Test_aci_posts/lDevVip-LDC_BIGIP_VE/lIf-External.json?"
+      host: 10.192.73.30
+      username: admin
+      password: cisco123
+      validate_certs: "false"
+    register: vlan
+
+  - name: debug
+    debug: msg="{{vlan}}"
+
+  - name: debug
+    debug: msg="{{(vlan.imdata[0]['vnsLIf']['attributes']['encap']).split('-')[1]}}"
