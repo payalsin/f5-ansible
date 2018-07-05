@@ -1,0 +1,28 @@
+tenant_name: "Test_aci_posts"
+consumerBD_name: "externalBD"
+providerBD_name: "internalBD"
+
+appProfile_name: "AppProfile"
+consumerEPG_name: "externalEPG"
+providerEPG_name: "internalEPG"
+
+SGtemplate_name: "SGT_BIGIP_VE"
+contract_name: "Unmanaged-2ARM-Contract"
+
+device_type: 'physical'
+mode: 'standalone'
+
+#Virtual
+logicalDeviceCluster_name: "LDC_BIGIP_VE"
+vmm_domain_name: 'vcenter'
+device1_vm_name: 'Payal_BIG-IP VE1-10.192.73.180'
+device2_vm_name: 'Payal_BIG-IP VE2-10.192.73.181'
+ldev_int_interface_map_network_adaptor: 'Network adapter 2'
+ldev_ext_interface_map_network_adaptor: 'Network adapter 3'
+
+#Physical
+device1_interface1_connectionPath: "pod-1/paths-102/pathep-[eth1/34]"
+device2_interface1_connectionPath: "pod-1/paths-103/pathep-[eth1/34]"
+consumer_vlan: "2695"
+provider_vlan: "2696"
+physical_domain_name: "ServiceUnmanagedPhy"
