@@ -1,4 +1,4 @@
-# Exercise 1: Using the bigip_facts module
+# Exercise 1: Using the bigip_virtual_server module
 
 ## Table of Contents
 
@@ -9,16 +9,16 @@
 
 # Objective
 
-Demonstrate use of the [BIG-IP Facts module](https://docs.ansible.com/ansible/latest/modules/bigip_facts_module.html) to grab facts (useful information) from a F5 BIG-IP device and display them to the terminal window using the [debug module](https://docs.ansible.com/ansible/latest/modules/debug_module.html).  
+Demonstrate use of the [BIG-IP virtual server module](https://docs.ansible.com/ansible/latest/modules/bigip_virtual_server_module.html) to configure a virtual server on the BIG-IP. Virtual server is a combination of IP:Port.
 
 # Guide
 
 ## Step 1:
 
-Using your text editor of choice create a new file called `bigip-facts.yml`.
+Using your text editor of choice create a new file called `bigip-virtual-server.yml`.
 
 ```
-[student1@ansible ~]$ nano bigip-facts.yml
+[student1@ansible ~]$ nano bigip-virtual-server.yml
 ```
 
 >`vim` and `nano` are available on the control node, as well as Visual Studio and Atom via RDP
@@ -27,14 +27,14 @@ Using your text editor of choice create a new file called `bigip-facts.yml`.
 
 Ansible playbooks are **YAML** files. YAML is a structured encoding format that is also extremely human readable (unlike it's subset - the JSON format).
 
-Enter the following play definition into `bigip-facts.yml`:
+Enter the following play definition into `bigip-virtual-server.yml`:
 
 ``` yaml
 ---
-- name: GRAB F5 FACTS
-  hosts: f5
+- name: BIG-IP SETUP
+  hosts: lb
   connection: local
-  gather_facts: no
+  gather_facts: false
 ```
 
 - The `---` at the top of the file indicates that this is a YAML file.
@@ -44,199 +44,87 @@ Enter the following play definition into `bigip-facts.yml`:
 
 ## Step 3
 
-Next, add the first `task`. This task will use the `bigip_facts` module to grab useful information from the BIG-IP device.
+Next, add the first `task`. This task will use the `bigip-virtual-server` to configure a virtual server on the BIG-IP
 
 ``` yaml
 ---
-- name: SIMPLE DEBUG PLAYBOOK
-  hosts: localhost
-  connection: local
-  gather_facts: no
-
-
-  tasks:
-
-    - name: COLLECT BIG-IP FACTS
-      bigip_facts:
-        include: system_info
-        server: "{{private_ip}}"
-        user: "{{ansible_user}}"
-        password: "{{ansible_ssh_pass}}"
-        server_port: 8443
-      register: bigip_facts
+- name: ADD VIRTUAL SERVER
+    bigip_virtual_server:
+      server: "{{private_ip}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: "8443"
+      name: "vip"
+      destination: "{{private_ip}}"
+      port: "443"
+      enabled_vlans: "all"
+      all_profiles: ['http','clientssl','oneconnect']
+      pool: "http_pool"
+      snat: "Automap"
+      validate_certs: "no"
 ```
 
 >A play is a list of tasks. Tasks and modules have a 1:1 correlation.  Ansible modules are reusable, standalone scripts that can be used by the Ansible API, or by the ansible or ansible-playbook programs. They return information to ansible by printing a JSON string to stdout before exiting.
 
-- `name: COLLECT BIG-IP FACTS` is a user defined description that will display in the terminal output.
-- `bigip_facts:` tells the task which module to use.  Everything except `register` is a module parameter defined on the module documentation page.
-- The `include: system_info` parameter tells the module only to grab system level information.
+- `name: ADD VIRTUAL SERVER` is a user defined description that will display in the terminal output.
+- `bigip_virtual_server:` tells the task which module to use.
 - The `server: "{{private_ip}}"` parameter tells the module to connect to the F5 BIG-IP IP address, which is stored as a variable `private_ip` in inventory
 - The `user: "{{ansible_user}}"` parameter tells the module the username to login to the F5 BIG-IP device with
 - The`password: "{{ansible_ssh_pass}}"` parameter tells the module the password to login to the F5 BIG-IP device with
 - The `server_port: 8443` parameter tells the module the port to connect to the F5 BIG-IP device with
-- `register: bigip_facts` tells the task to save the output to a variable bigip_facts
+- The `name: "vip"` parameter tells the module to create a virtual server named vip
+- The `destination"` parameter tells the module which IP address to assign for the virtual server
+- The `port` paramter tells the module which Port the virtual server will be listening on
+- The `enabled_vlans` parameter tells the module which all vlans the virtual server is enbaled for
+- The `all_profiles` paramter tells the module which all profiles are assigned to the virtuals server 
+- The `pool` parameter tells the module which pool is assigned to the virtual server
+- The `snat` paramter tells the module what the Source network address address should be. In this module we are assigning it to be Automap which means the source address on the request that goes to the backend server will be the self-ip address of the BIG-IP
+- The `validate_certs: "no"` parameter tells the module to not validate SSL certificates.  This is just used for demonstration purposes since this is a lab.
 
 ## Step 4
 
-Next, add the second `task`. This task will use the `debug` module to print the output from bigip_facts variable we registered the facts to.
-
-```yaml
----
-- name: SIMPLE DEBUG PLAYBOOK
-  hosts: localhost
-  connection: local
-  gather_facts: no
-
-
-  tasks:
-
-    - name: COLLECT BIG-IP FACTS
-      bigip_facts:
-        include: system_info
-        server: "{{private_ip}}"
-        user: "{{ansible_user}}"
-        password: "{{ansible_ssh_pass}}"
-        server_port: 8443
-      register: bigip_facts
-
-    - name: COMPLETE BIG-IP SYSTEM INFORMATION
-      debug:
-        var: bigip_facts
-```
-
-- The `name: COMPLETE BIG-IP SYSTEM INFORMATION` is a user defined description that will display in the terminal output.
-- `debug:` tells the task to use the debug module.
-- The `var: bigip_facts` parameter tells the module to display the variable bigip_facts.
-
-
-## Step 5
-
 Run the playbook - exit back into the command line of the control host and execute the following:
 
 ```
-[student1@ansible ~]$ ansible-playbook bigip-facts.yml
-```
-
-## Step 6
-
-Finally lets add two more tasks to get more specific info from facts gathered.
-
-```yaml
----
-- name: GRAB F5 FACTS
-  hosts: f5
-  connection: local
-  gather_facts: no
-
-  tasks:
-    - name: COLLECT BIG-IP FACTS
-      bigip_facts:
-        include: system_info
-        server: "{{private_ip}}"
-        user: "{{ansible_user}}"
-        password: "{{ansible_ssh_pass}}"
-        server_port: 8443
-      register: bigip_facts
-
-    - name: COMPLETE BIG-IP SYSTEM INFORMATION
-      debug:
-        var: bigip_facts
-
-    - name: GRABBING ONLY THE MAC ADDRESS
-      debug:
-        var: bigip_facts['ansible_facts']['system_info']['base_mac_address']
-
-    - name: GRABBING ONLY THE VERSION
-      debug:
-        var: bigip_facts['ansible_facts']['system_info']['product_information']['product_version']
-```
-
-- `var: bigip_facts['ansible_facts']['system_info']['base_mac_address']` displays the MAC address for the BIG-IP device
-- `bigip_facts['ansible_facts']['system_info']['product_information']['product_version']` displays the product version BIG-IP device
-
->Because the bigip_facts module returns useful information in structured data, it is really easy to grab specific information without using regex or filters.  Fact modules are very powerful tools to grab specific device information that can be used in subsequent tasks, or even used to create dynamic documentation (reports, csv files, markdown).
-
-
-## Step 7
-
-Run the playbook - exit back into the command line of the control host and execute the following:
-
-```
-[student1@ansible ~]$ ansible-playbook bigip-facts.yml
+[student1@ansible ~]$ ansible-playbook bigip-virtual-server.yml
 ```
 
 # Playbook Output
-
-The output will look as follows.
-
-```yaml
-[student1@ansible ~]$ ansible-playbook bigip-facts.yml
-
-PLAY [GRAB F5 FACTS] ***********************************************************
-
-TASK [COLLECT BIG-IP FACTS] ****************************************************
-ok: [f5]
-
-TASK [COMPLETE BIG-IP SYSTEM INFORMATION] **************************************
-ok: [f5] => {
-    "bigip_facts": {
-        "ansible_facts": {
-            "system_info": {
-                "base_mac_address": "0A:D1:27:C1:84:76",
-                "blade_temperature": [],
-                "chassis_slot_information": [],
-                "globally_unique_identifier": "0A:D1:27:C1:84:76",
-                "group_id": "DefaultGroup",
-                "hardware_information": [
-<<output removed for brevity>>
-
----
-TASK [GRABBING ONLY THE MAC ADDRESS] *******************************************
-ok: [f5] => {
-    "bigip_facts['ansible_facts']['system_info']['base_mac_address']": "0A:D1:27:C1:84:76"
-}
-
-TASK [GRABBING ONLY THE VERSION] ***********************************************
-ok: [f5] => {
-    "bigip_facts['ansible_facts']['system_info']['product_information']['product_version']": "13.1.0.2"
-}
-
-PLAY RECAP *********************************************************************
-f5                         : ok=4    changed=0    unreachable=0    failed=0
-```
+>*output to be given here
 
 # Solution
 The finished Ansible Playbook is provided here for an Answer key.
 
 ```yaml
 ---
-- name: GRAB F5 FACTS
-  hosts: f5
+- name: BIG-IP SETUP
+  hosts: lb
   connection: local
-  gather_facts: no
+  gather_facts: false
 
   tasks:
-    - name: COLLECT BIG-IP FACTS
-      bigip_facts:
-        include: system_info
-        server: "{{private_ip}}"
-        user: "{{ansible_user}}"
-        password: "{{ansible_ssh_pass}}"
-        server_port: 8443
-      register: bigip_facts
 
-    - name: COMPLETE BIG-IP SYSTEM INFORMATION
-      debug:
-        var: bigip_facts
-
-    - name: GRABBING ONLY THE MAC ADDRESS
-      debug:
-        var: bigip_facts['ansible_facts']['system_info']['base_mac_address']
-
-    - name: GRABBING ONLY THE VERSION
-      debug:
-        var: bigip_facts['ansible_facts']['system_info']['product_information']['product_version']
+  - name: ADD VIRTUAL SERVER
+    bigip_virtual_server:
+      server: "{{private_ip}}"
+      user: "{{ansible_user}}"
+      password: "{{ansible_ssh_pass}}"
+      server_port: "8443"
+      name: "vip"
+      destination: "{{private_ip}}"
+      port: "443"
+      enabled_vlans: "all"
+      all_profiles: ['http','clientssl','oneconnect']
+      pool: "http_pool"
+      snat: "Automap"
+      validate_certs: "no"
 ```
+
+# Verifying the Solution
+
+Login to the F5 with your web browser to see what was configured.  Grab the IP information for the F5 load balancer from the lab_inventory/hosts file, and type it in like so: https://X.X.X.X:8443/
+
+The load balancer virtual server can be found by navigating the menu on the left.  Click on Local Traffic-> then click on Virtual Server.
+>*Image to be inserted
 
 You have finished this exercise.  [Click here to return to the lab guide](../README.md)
