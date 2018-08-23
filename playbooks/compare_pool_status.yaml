@@ -11,7 +11,7 @@
   - name: Query BIG-IP1 facts for Pool Status
     bigip_facts:
        validate_certs: False
-       server: "10.192.73.218"
+       server: "10.192.73.xxx"
        server_port: 443
        user: "admin"
        password: "admin"
@@ -29,16 +29,14 @@
   - name: Query BIG-IP2 facts for Pool Status
     bigip_facts:
        validate_certs: False
-       server: "10.192.73.253"
+       server: "10.192.73.xxx"
        server_port: 443
        user: "admin"
        password: "admin"
        include: pool
     delegate_to: localhost
-    register: bigip_facts1
 
-  - name: set members
-    set_fact:
+  - set_fact:
       members2: "{{ ansible_facts.pool[pool_path].monitor_instance }}"
 
   - name: Print BIG-IP2 members
