@@ -1,0 +1,49 @@
+---
+- name: Compare Pool Member Status
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+  - name: Query BIG-IP1 facts for Pool Status
+    bigip_facts:
+       validate_certs: False
+       server: "10.192.73.xxx"
+       server_port: 443
+       user: "admin"
+       password: "admin"
+       include: pool
+    delegate_to: localhost
+    register: bigip1_facts
+
+  - set_fact:
+     members1: "{{bigip1_facts['pool']['/Common/Test-Pool']['monitor_instance']}}"
+
+  - name: Print BIG-IP1 members
+    debug: msg="{{item.instance['instance_definition']['ipport']['address']}} =>  {{item.instance_state}}"
+    with_items: "{{members1}}"
+
+  - name: Query BIG-IP2 facts for Pool Status
+    bigip_facts:
+       validate_certs: False
+       server: "10.192.73.xxx"
+       server_port: 443
+       user: "admin"
+       password: "admin"
+       include: pool
+    delegate_to: localhost
+    register: bigip2_facts
+
+  - set_fact:
+      members2: "{{bigip2_facts['pool']['/Common/Test-Pool']['monitor_instance']}}"
+
+  - name: Print BIG-IP2 members
+    debug: msg="{{item.instance['instance_definition']['ipport']['address']}} =>  {{item.instance_state}}"
+    with_items: "{{members2}}"
+
+  - name: Fail if status does not match
+    debug: msg="{{item[0].instance['instance_definition']['ipport']['address']}} =>  {{item[0].instance_state}} , {{item[1].instance['instance_definition']['ipport']['address']}} =>  {{item[1].instance_state}}"
+    failed_when: (item[0].instance['instance_definition']['ipport']['address'] == item[1].instance['instance_definition']['ipport']['address']) and (item[0].instance_state != item[1].instance_state)
+    with_nested:
+     - "{{members1}}"
+     - "{{members2}}"
