@@ -18,5 +18,5 @@
   Default region name [None]: us-west-2 (Right now this is the one supported for Blue)
 * `pip install ansible --upgrade`
 * Run the playbook
-  - Copy the playbooks and the variable files to the same folder if running via CLI 
+  - Copy the playbooks, variable files and the CFT file to the same folder when running via CLI
   - `ansible-playbook playbook-name`
