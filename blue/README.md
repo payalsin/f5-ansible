@@ -1,4 +1,6 @@
-* Create an Access Key ID and Secret Access Key. Save the ID and key for later, use it when you run 'aws configure'
+**Pre-requisites**
+
+* Create an Access Key ID and Secret Access Key. Save the ID and key for later, use it when you run 'aws configure' This is needed so that in the playbooks you dont have to specify the AWS crendentails for each task
   - Go to IAM
   - Click on Users
   - Create a new user or use an existing user
