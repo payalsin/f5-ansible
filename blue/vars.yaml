@@ -1,0 +1,12 @@
+stack_name: "Blue-CloudFormation"
+cft_template: "blue-cft.json"
+vpc_id: ""
+vpc_cidr: "10.0.0.0/16"
+subnet_id: ""
+keypair: ""
+
+api_readiness_success: "HTTP Error 401: Unauthorized"
+ui_readiness_success: "HTTP 301 Moved Permanently"
+
+app_name: "testapp2"
+traffic_path_name: "testtraffic1"
