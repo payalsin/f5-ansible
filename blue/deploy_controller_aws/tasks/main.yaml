@@ -69,7 +69,7 @@
     body:
      password_payload:
       current_password: "{{stack.stack_outputs.Password}}"
-      new_password: "default12345!"
+      new_password: "{{admin_password}}"
     body_format: json
     validate_certs: false
 
