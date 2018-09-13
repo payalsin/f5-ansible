@@ -6,7 +6,6 @@ subnet_id: ""
 keypair: ""
 
 api_readiness_success: "HTTP Error 401: Unauthorized"
-ui_readiness_success: "HTTP 301 Moved Permanently"
 admin_password: "default"
 
 app_name: "testapp2"
