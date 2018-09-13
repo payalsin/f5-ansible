@@ -1,0 +1,10 @@
+---
+- name: Deploy Contoller
+  hosts: localhost
+  gather_facts: false
+  connection: local
+
+  roles:
+  - { role: deploy_controller_aws }
+  - { role: deploy_controller_aws, stack_name: "Blue1-CloudFormation" }
+     
