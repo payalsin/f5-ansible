@@ -5,6 +5,6 @@
   connection: local
 
   roles:
-  - { role: deploy_controller_aws }
-  - { role: deploy_controller_aws, stack_name: "Blue1-CloudFormation" }
+  - { role: deploy_controller_aws, stack_name: "Blue-Deployment1-CloudFormation", admin_password: "default1"}
+  - { role: deploy_controller_aws, stack_name: "Blue-Deployment2-CloudFormation", admin_password: "default2" }
      
