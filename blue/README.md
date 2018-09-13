@@ -17,6 +17,21 @@
   AWS Secret Access Key [None]: 
   Default region name [None]: us-west-2 (Right now this is the one supported for Blue)
 * `pip install ansible --upgrade`
+
+**If running a standalone playbook (no role)**
+* Copy the playbook, variable files and the CFT file to the same folder on your Ansible control node
+  - spin-up-blue-controller-aws.yaml
+  - vars.yaml
+  - blue-cft.json (The is the name I have given to the CFT) 
+ * Run the playbook
+  - `ansible-playbook spin-up-blue-controller-aws.yaml`
+
+**If running the playbook as a role**
+* Navigate to the directory from where you run your playbooks.
+* Make a new directory called roles
+* Copy directory (deploy_controller_aws) to the roles directory
+* Navigate back to the directory from where you run your playbooks and copy the following files
+  - controller_aws.yaml
+  - blue-cft.json
 * Run the playbook
-  - Copy the playbooks, variable files and the CFT file to the same folder when running via CLI
-  - `ansible-playbook playbook-name`
+  - `ansible-playbook controller_aws.yaml`
