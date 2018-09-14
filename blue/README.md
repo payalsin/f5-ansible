@@ -15,7 +15,7 @@
 * Run `aws configure`, enter the following (https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)
   - AWS Access Key ID [None]: 
   - AWS Secret Access Key [None]: 
-  - Default region name [None]: us-west-2 (Right now this is the one supported for Blue)
+  - Default region name [None]: us-west-2
 * `pip install ansible --upgrade`
 
 **If running a standalone playbook (no role)**
@@ -35,3 +35,5 @@
   - blue-cft.json
 * Run the playbook
   - `ansible-playbook controller_aws.yaml`
+
+>**Note - The standalone playbook and the role perform the same task. Both will spin up a blue controller and after execution the playbook will return the authentication token for user admin. The authentication token will be copied to a file with the name <your_stack_name_admin_auth_token.yaml>. This token can then be referenced in other playbooks**
