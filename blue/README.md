@@ -23,7 +23,7 @@
   - spin-up-blue-controller-aws.yaml
   - vars.yaml
   - blue-cft.json (The is the name I have given to the CFT) 
- * Run the playbook
+* Run the playbook
   - `ansible-playbook spin-up-blue-controller-aws.yaml`
 
 **If running the playbook as a role**
