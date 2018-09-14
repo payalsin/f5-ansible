@@ -13,9 +13,9 @@
   - `pip install botocore --upgrade`
 * `pip install awscli`
 * Run `aws configure`, enter the following (https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)
-  AWS Access Key ID [None]: 
-  AWS Secret Access Key [None]: 
-  Default region name [None]: us-west-2 (Right now this is the one supported for Blue)
+  - AWS Access Key ID [None]: 
+  - AWS Secret Access Key [None]: 
+  - Default region name [None]: us-west-2 (Right now this is the one supported for Blue)
 * `pip install ansible --upgrade`
 
 **If running a standalone playbook (no role)**
