@@ -1,3 +1,2 @@
 cft_template: "blue-cft.json"
 api_readiness_success: "HTTP Error 401: Unauthorized"
-ui_readiness_success: "HTTP 301 Moved Permanently"
