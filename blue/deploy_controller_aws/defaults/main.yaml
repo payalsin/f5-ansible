@@ -1,6 +1,0 @@
-stack_name: "Blue-CloudFormation"
-vpc_id: "vpc-043855435da2a2c33"
-vpc_cidr: "10.0.0.0/16"
-subnet_id: "subnet-05e90664c8bd09748"
-keypair: "PSKey-us-west-2"
-admin_password: "default"
