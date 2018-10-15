@@ -1,0 +1,132 @@
+- name: Onboard
+  hosts: localhost
+  connection: local
+  
+  #Variable file included
+  vars_files:
+    - var.yml
+
+  #Environment variables defined
+  environment:
+    F5_USER: "{{ username }}"
+    F5_PASSWORD: "{{ password }}"
+    F5_SERVER_PORT: "443"
+    F5_VALIDATE_CERTS: "False"
+  
+  tasks:
+    
+  #Onboard the BIG-IP (NTP/Hostname/SSHD/DNS)
+  - name: Configure NTP server on BIG-IP
+    bigip_device_ntp:
+      server: "{{ IPAddress }}"
+      ntp_servers: "{{ ntp_servers }}"
+    delegate_to: localhost
+
+  - name: Configure BIG-IP hostname
+    bigip_hostname:
+      server: "{{ IPAddress }}"
+      hostname: "{{ hostname }}"
+    delegate_to: localhost
+
+  - name: Manage SSHD setting on BIG-IP
+    bigip_device_sshd:
+      server: "{{ IPAddress }}"
+      banner: "enabled"
+      banner_text: " {{ banner_text }}"
+    delegate_to: localhost
+
+  - name: Manage BIG-IP DNS settings
+    bigip_device_dns:
+     server: "{{ IPAddress }}"
+     name_servers: "{{ dns_servers }}"
+    delegate_to: localhost
+
+#Network the BIG-IP (VLANS/Self-IP configuration)
+  - name: Configure VLANs on the BIG-IP
+    bigip_vlan:
+     server: "{{ IPAddress }}"
+     name: "{{ item.name }}"
+     tag: "{{ item.tag }}"
+     untagged_interface: "{{ item.interface }}"
+    with_items: "{{ vlan_information }}"
+    delegate_to: localhost
+
+  - name: Configure SELF-IPs on the BIG-IP
+    bigip_selfip:
+     server: "{{ IPAddress }}"
+     name: "{{ item.name }}"
+     address: "{{ item.address }}"
+     netmask: "{{ item.netmask }}"
+     vlan: "{{ item.vlan }}"
+     allow_service: "{{item.allow_service}}"
+    with_items: "{{ selfip_information }}"
+    delegate_to: localhost
+
+#Deploy ASM policy
+  - name: Create an LTM policy
+    bigip_policy:
+      server: "{{ IPAddress }}"
+      name: asm-policy
+
+  - name: Import and activate ASM policy
+    bigip_asm_policy:
+      server: "{{ IPAddress }}"
+      name: Demo
+      file: "asm_policy.xml"
+      active: yes
+      state: present
+    delegate_to: localhost
+
+  - name: Replace a forward action with an ASM action - Idempotent check
+    bigip_policy_rule:
+      server: "{{ IPAddress }}"
+      policy: asm-policy
+      name: rule1
+      actions:
+      - type: enable
+        asm_policy: Demo
+
+#Create VS/Pool/members
+  - name: Create nodes
+    bigip_node:
+      server: "{{ IPAddress }}"
+      host: "{{item.host}}"
+      name: "{{item.host}}"
+    with_items: "{{pool_members}}"
+    delegate_to: localhost
+
+  - name: Create pool
+    bigip_pool:
+      server: "{{ IPAddress }}"
+      state: "present"
+      name: "http-pool"
+      lb_method: "round-robin"
+      monitors: "/Common/http"
+      monitor_type: "and_list"
+    delegate_to: localhost
+
+  - name: Add Pool members
+    bigip_pool_member:
+      server: "{{ IPAddress }}"
+      name: "{{item.host}}"
+      host: "{{item.host}}"
+      port: "{{item.port}}"
+      pool: "http-pool"
+    with_items: "{{pool_members}}"
+    delegate_to: localhost
+
+  #Attach ASM profile to the virtual server amongst other configurations
+  - name: Add Virtual Server
+    bigip_virtual_server:
+      server: "{{ IPAddress }}"
+      name: "{{vip_name}}"
+      destination: "{{vip_ip}}"
+      port: "{{vip_port}}"
+      pool: "http-pool"
+      snat: "Automap"
+      profiles:
+       - http
+       - websecurity
+      policies:
+       - asm-policy
+    delegate_to: localhost
