@@ -44,4 +44,4 @@ pool_members:
 
 vip_name: "http"
 vip_port: "80"
-vip_ip: "10.168.68.12"
+vip_ip: "10.168.68.13"
