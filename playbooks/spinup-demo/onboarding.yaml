@@ -3,6 +3,9 @@
   connection: local
   
   #Variable file included
+  vars:
+   IPAddress: "10.192.73.246"
+   
   vars_files:
     - var.yml
 
