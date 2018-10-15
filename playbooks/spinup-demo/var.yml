@@ -41,3 +41,7 @@ module_provisioning:
 pool_members:
 - port: "80"
   host: "192.168.68.141"
+
+vip_name: "http"
+vip_port: "80"
+vip_ip: "10.168.68.12"
