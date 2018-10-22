@@ -1,6 +1,7 @@
 - name: Onboard
   hosts: localhost
   connection: local
+  gather_facts: false
   
   #Variable file included
   vars:
