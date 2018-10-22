@@ -1,0 +1,71 @@
+- name: Onboard Cleanup
+  hosts: localhost
+  connection: local
+  
+  #Variable file included
+  vars:
+   IPAddress: "10.192.73.246"
+   
+  vars_files:
+    - var.yml
+
+  #Environment variables defined
+  environment:
+    F5_USER: "{{ username }}"
+    F5_PASSWORD: "{{ password }}"
+    F5_SERVER_PORT: "443"
+    F5_VALIDATE_CERTS: "False"
+  
+  tasks:
+  
+  - name: Delete Virtual Server
+    bigip_virtual_server:
+      server: "{{ IPAddress }}"
+      name: "{{vip_name}}"
+      state: absent
+  
+  - name: Delete pool
+    bigip_pool:
+      server: "{{ IPAddress }}"
+      state: "absent"
+      name: "http-pool"
+ 
+  - name: Delete nodes
+    bigip_node:
+      server: "{{ IPAddress }}"
+      host: "{{item.host}}"
+      name: "{{item.host}}"
+      state: absent
+    with_items: "{{pool_members}}"
+
+  - name: Replace a forward action with an ASM action
+    bigip_policy_rule:
+      server: "{{ IPAddress }}"
+      policy: asm-policy
+      state: absent
+        
+  - name: Delete an LTM policy
+    bigip_policy:
+      server: "{{ IPAddress }}"
+      name: asm-policy
+      state: absent
+      
+  - name: Delete ASM policy
+    bigip_asm_policy:
+      server: "{{ IPAddress }}"
+      name: Demo
+      state: absent
+  
+  - name: Delete SELF-IPs on the BIG-IP
+    bigip_selfip:
+     server: "{{ IPAddress }}"
+     name: "{{ item.name }}"
+     state: absent
+    with_items: "{{ selfip_information }}"
+    
+  - name: Delete VLANs on the BIG-IP
+    bigip_vlan:
+     server: "{{ IPAddress }}"
+     name: "{{ item.name }}"
+     state: absent
+    with_items: "{{ vlan_information }}"
