@@ -38,12 +38,6 @@
       name: "{{item.host}}"
       state: absent
     with_items: "{{pool_members}}"
-
-  - name: Replace a forward action with an ASM action
-    bigip_policy_rule:
-      server: "{{ IPAddress }}"
-      policy: asm-policy
-      state: absent
         
   - name: Delete an LTM policy
     bigip_policy:
