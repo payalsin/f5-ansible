@@ -80,7 +80,7 @@
       state: present
     delegate_to: localhost
 
-  - name: Replace a forward action with an ASM action - Idempotent check
+  - name: Replace a forward action with an ASM action
     bigip_policy_rule:
       server: "{{ IPAddress }}"
       policy: asm-policy
