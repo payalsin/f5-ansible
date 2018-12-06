@@ -1,0 +1,75 @@
+```
+#cloud-config
+
+write_files:
+ - path: /config/onboarding/waitForF5Ready.sh
+   permissions: 0755
+   owner: root:root
+   encoding: b64
+   content: IyEvYmluL2Jhc2gKCgplY2hvIGBkYXRlYCAtLSBXYWl0aW5nIGZvciBGNSB0byBiZSByZWFkeQpzbGVlcCA1CndoaWxlIFtbICEgLWUgJy92YXIvcHJvbXB0L3BzMScgXV07IGRvCiAgZWNobyAtbiAnLicKICBzbGVlcCA1CmRvbmUKCnNsZWVwIDUKClNUQVRVUz1gY2F0IC92YXIvcHJvbXB0L3BzMWAK      d2hpbGUgW1sgJHtTVEFUVVN9eCAhPSAnTk8gTElDRU5TRSd4IF1dOyBkbwogIGVjaG8gLW4gJy4nCiAg      c2xlZXAgNQogIFNUQVRVUz1gY2F0IC92YXIvcHJvbXB0L3BzMWAKZG9uZQoKZWNobyAtbiAnICcKCndo      aWxlIFtbICEgLWUgJy92YXIvcHJvbXB0L2NtaVN5bmNTdGF0dXMnIF1dOyBkbwogIGVjaG8gLW4gJy4n      CiAgc2xlZXAgNQpkb25lCgpTVEFUVVM9YGNhdCAvdmFyL3Byb21wdC9jbWlTeW5jU3RhdHVzYAp3aGlsZSBbWyAke1NUQVRVU314ICE9ICdTdGFuZGFsb25lJ3ggXV07IGRvCiAgZWNobyAtbiAnLicKICBzbGVl      cCA1CiAgU1RBVFVTPWBjYXQgL3Zhci9wcm9tcHQvY21pU3luY1N0YXR1c2AKZG9uZQplY2hvCmVjaG8g      YGRhdGVgIC0tIEY1IGlzIHJlYWR5Li4uCgoK
+
+ - path: /config/onboarding/setupLogging.sh
+   permissions: 0755
+   owner: root:root
+   encoding: b64
+   content: ICMhL2Jpbi9iYXNoCgpGSUxFPS92YXIvbG9nL29uYm9hcmQubG9nCmlmIFsgISAtZSAkRklMRSBdCnRoZW4KICB0b3VjaCAkRklMRQogIG5vaHVwICQwIDA8Ji0gJj4vZGV2L251bGwgJgogIGV4aXQKZmkKZXhlYyAxPCYtCmV4ZWMgMjwmLQpleGVjIDE8PiRGSUxFCmV4ZWMgMj4mMQo=
+
+ - path: /etc/profile.d/cisco.interal.proxies.sh
+   permissions: 0755
+   owner: root:root
+   encoding: b64
+   content: IyBBZGRpbmcgY2lzY28gcHJveGllcwpleHBvcnQgaHR0cF9wcm94eT1odHRwOi8vcHJveHkuZXNsLmNpc2NvLmNvbTo4MC8KZXhwb3J0IGh0dHBzX3Byb3h5PWh0dHA6Ly9wcm94eS5lc2wuY2lzY28uY29tOjgwLw==
+
+ - path: /config/onboarding/onboard.sh
+   permissions: 0755
+   owner: root:root
+   content: |
+     #!/bin/bash
+
+     . /config/onboarding/setupLogging.sh
+
+     if [ -e /config/onboarding/waitForF5Ready.sh ]
+     then
+         echo "/config/onboarding/waitForF5Ready.sh exists"
+         /config/onboarding/waitForF5Ready.sh
+     else
+         echo "/config/onboarding/waitForF5Ready.sh is missing"
+         echo "Failsafe sleep for 5 minutes..."
+         sleep 5m
+     fi
+
+     echo "Configure access"
+     tmsh modify sys global-settings hostname f5-csp-demo1.com
+     tmsh modify auth user admin shell bash password admin
+     tmsh modify sys db systemauth.disablerootlogin value true
+     tmsh save /sys config
+
+     echo "Disable mgmt-dhcp..."
+     tmsh modify sys global-settings mgmt-dhcp disabled
+     echo "Set Management IP..."
+     tmsh create /sys management-ip <<mgmt-ip/mask>> Example:10.192.74.45/24
+     tmsh create /sys management-route default gateway <<gateway_ip>> Example:10.192.74.1
+     echo "Save changes..."
+     tmsh save /sys config partitions all
+     echo "Set NTP..."
+     tmsh modify sys ntp servers add { 0.pool.ntp.org 1.pool.ntp.org }
+     tmsh modify sys ntp timezone America/Los_Angeles
+     echo "Add DNS server..."
+     tmsh modify sys dns name-servers add { <<ntp_ip>> } Example: 172.27.1.1
+     tmsh modify sys httpd ssl-port 8443
+     tmsh modify net self-allow defaults add { tcp:8443 }
+     if [[ \ "8443\ " != \ "443\ " ]]
+         then tmsh modify net self-allow defaults delete { tcp:443 }
+     fi
+     tmsh mv cm device bigip1 <<hostname>> Example:f5-csp-demo1.com
+     tmsh save /sys config
+
+     echo "Register F5..."
+     #. /etc/profile.d/cisco.interal.proxies.sh
+     tmsh install /sys license registration-key XXXXX-XXXXX-XXXXX-XXXXX-XXXXXXX
+     tmsh show sys license
+
+     date
+
+runcmd: [nohup sh -c '/config/onboarding/onboard.sh' &]
+```
