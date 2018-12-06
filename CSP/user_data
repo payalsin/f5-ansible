@@ -1,4 +1,3 @@
-```
 #cloud-config
 
 write_files:
@@ -6,7 +5,7 @@ write_files:
    permissions: 0755
    owner: root:root
    encoding: b64
-   content: IyEvYmluL2Jhc2gKCgplY2hvIGBkYXRlYCAtLSBXYWl0aW5nIGZvciBGNSB0byBiZSByZWFkeQpzbGVlcCA1CndoaWxlIFtbICEgLWUgJy92YXIvcHJvbXB0L3BzMScgXV07IGRvCiAgZWNobyAtbiAnLicKICBzbGVlcCA1CmRvbmUKCnNsZWVwIDUKClNUQVRVUz1gY2F0IC92YXIvcHJvbXB0L3BzMWAK      d2hpbGUgW1sgJHtTVEFUVVN9eCAhPSAnTk8gTElDRU5TRSd4IF1dOyBkbwogIGVjaG8gLW4gJy4nCiAg      c2xlZXAgNQogIFNUQVRVUz1gY2F0IC92YXIvcHJvbXB0L3BzMWAKZG9uZQoKZWNobyAtbiAnICcKCndo      aWxlIFtbICEgLWUgJy92YXIvcHJvbXB0L2NtaVN5bmNTdGF0dXMnIF1dOyBkbwogIGVjaG8gLW4gJy4n      CiAgc2xlZXAgNQpkb25lCgpTVEFUVVM9YGNhdCAvdmFyL3Byb21wdC9jbWlTeW5jU3RhdHVzYAp3aGlsZSBbWyAke1NUQVRVU314ICE9ICdTdGFuZGFsb25lJ3ggXV07IGRvCiAgZWNobyAtbiAnLicKICBzbGVl      cCA1CiAgU1RBVFVTPWBjYXQgL3Zhci9wcm9tcHQvY21pU3luY1N0YXR1c2AKZG9uZQplY2hvCmVjaG8g      YGRhdGVgIC0tIEY1IGlzIHJlYWR5Li4uCgoK
+   content: IyEvYmluL2Jhc2gKCgplY2hvIGBkYXRlYCAtLSBXYWl0aW5nIGZvciBGNSB0byBiZSByZWFkeQpzbGVlcCA1CndoaWxlIFtbICEgLWUgJy92YXIvcHJvbXB0L3BzMScgXV07IGRvCiAgZWNobyAtbiAnLicKICBzbGVlcCA1CmRvbmUKCnNsZWVwIDUKClNUQVRVUz1gY2F0IC92YXIvcHJvbXB0L3BzMWAKd2hpbGUgW1sgJHtTVEFUVVN9eCAhPSAnTk8gTElDRU5TRSd4IF1dOyBkbwogIGVjaG8gLW4gJy4nCiAgc2xlZXAgNQogIFNUQVRVUz1gY2F0IC92YXIvcHJvbXB0L3BzMWAKZG9uZQoKZWNobyAtbiAnICcKCndoaWxlIFtbICEgLWUgJy92YXIvcHJvbXB0L2NtaVN5bmNTdGF0dXMnIF1dOyBkbwogIGVjaG8gLW4gJy4nCiAgc2xlZXAgNQpkb25lCgpTVEFUVVM9YGNhdCAvdmFyL3Byb21wdC9jbWlTeW5jU3RhdHVzYAp3aGlsZSBbWyAke1NUQVRVU314ICE9ICdTdGFuZGFsb25lJ3ggXV07IGRvCiAgZWNobyAtbiAnLicKICBzbGVlcCA1CiAgU1RBVFVTPWBjYXQgL3Zhci9wcm9tcHQvY21pU3luY1N0YXR1c2AKZG9uZQplY2hvCmVjaG8gYGRhdGVgIC0tIEY1IGlzIHJlYWR5Li4uCgoK
 
  - path: /config/onboarding/setupLogging.sh
    permissions: 0755
@@ -39,37 +38,36 @@ write_files:
      fi
 
      echo "Configure access"
-     tmsh modify sys global-settings hostname f5-csp-demo1.com
-     tmsh modify auth user admin shell bash password admin
+     tmsh modify sys global-settings hostname <<hostname>> Example:f5-csp-demo.com
+     tmsh modify auth user admin shell bash password <<admin_password>> Example:admin
      tmsh modify sys db systemauth.disablerootlogin value true
      tmsh save /sys config
 
      echo "Disable mgmt-dhcp..."
      tmsh modify sys global-settings mgmt-dhcp disabled
      echo "Set Management IP..."
-     tmsh create /sys management-ip <<mgmt-ip/mask>> Example:10.192.74.45/24
-     tmsh create /sys management-route default gateway <<gateway_ip>> Example:10.192.74.1
+     tmsh create /sys management-ip <<mgmt-ip/mask>> Example: 10.192.74.45/24
+     tmsh create /sys management-route default gateway <<gateway_ip>> Example: 10.192.74.1
      echo "Save changes..."
      tmsh save /sys config partitions all
      echo "Set NTP..."
      tmsh modify sys ntp servers add { 0.pool.ntp.org 1.pool.ntp.org }
      tmsh modify sys ntp timezone America/Los_Angeles
-     echo "Add DNS server..."
-     tmsh modify sys dns name-servers add { <<ntp_ip>> } Example: 172.27.1.1
+     echo "Add DNS server...
+     tmsh modify sys dns name-servers add { <<ntp_ip>> } Example: 172.27.1.1 
      tmsh modify sys httpd ssl-port 8443
      tmsh modify net self-allow defaults add { tcp:8443 }
      if [[ \ "8443\ " != \ "443\ " ]]
          then tmsh modify net self-allow defaults delete { tcp:443 }
      fi
-     tmsh mv cm device bigip1 <<hostname>> Example:f5-csp-demo1.com
+     tmsh mv cm device bigip1 <<hostname>> Example: f5-csp-demo.com
      tmsh save /sys config
 
      echo "Register F5..."
-     #. /etc/profile.d/cisco.interal.proxies.sh
-     tmsh install /sys license registration-key XXXXX-XXXXX-XXXXX-XXXXX-XXXXXXX
+     tmsh install /sys license registration-key xxxxx-xxxxx-xxxxx-xxxxx-xxxxxxx
      tmsh show sys license
 
      date
 
 runcmd: [nohup sh -c '/config/onboarding/onboard.sh' &]
-```
+
