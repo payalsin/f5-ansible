@@ -1,6 +1,6 @@
 ---
 - name: "Patching Application Servers"
-  hosts: localhost
+  hosts: bigip
   gather_facts: false
   connection: local
 
@@ -8,7 +8,7 @@
   - name: Setup provider
     set_fact:
      provider:
-      server: "10.192.73.219"
+      server: "{{inventory_hostname}}"
       user: "admin"
       password: "admin"
       server_port: "443"
@@ -32,7 +32,7 @@
      name: "{{item}}"
      groups: "appservers"
      pool_port: "{{item.split(':')[1]}}"
-     pool_name: "{{pool_name.user_input}}"
+     pool_name: "{{pool_name}}"
     loop: "{{bigip_facts.ltm_pools | json_query(query_string)}}"
     vars:
      query_string: "[?name=='{{pool_name}}'].members[*].name[]"
