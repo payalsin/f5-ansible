@@ -1,9 +1,7 @@
 ---
-- name: "Patching Application Servers"
-  hosts: bigip
-  gather_facts: false
-  connection: local
- 
+- name: Setting variables
+  hosts: all
+  
   vars:
    provider:
       server: "{{inventory_hostname}}"
@@ -11,7 +9,12 @@
       password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") }}'
       server_port: "443"
       validate_certs: "no"
-    
+      
+- name: "Patching Application Servers"
+  hosts: bigip
+  gather_facts: false
+  connection: local
+ 
   tasks:
   #- name: Setup provider
   #  set_fact:
