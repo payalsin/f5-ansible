@@ -45,7 +45,7 @@
   serial: 1
 
   tasks:
-  - debug: "msg={{inventroy_hostname}}"
+  - debug: "msg={{inventory_hostname}}"
   
   - name: Setup provider
     set_fact:
