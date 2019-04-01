@@ -9,8 +9,8 @@
     set_fact:
      provider:
       server: "{{inventory_hostname}}"
-      user: "{{ansible_user}}"
-      password: "{{ansible_password}}"
+      username: '{{ lookup("env", "ANSIBLE_NET_USERNAME") }}'
+      password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") }}'
       server_port: "443"
       validate_certs: "no"
 
@@ -47,8 +47,8 @@
     set_fact:
      provider:
       server: "{{inventory_hostname}}"
-      user: "{{ansible_user}}"
-      password: "{{ansible_password}}"
+      username: '{{ lookup("env", "ANSIBLE_NET_USERNAME") }}'
+      password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") }}'
       server_port: "443"
       validate_certs: "no"
 
