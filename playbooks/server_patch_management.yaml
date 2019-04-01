@@ -5,14 +5,14 @@
   connection: local
  
   tasks:
-  #- name: Setup provider
-  #  set_fact:
-  #   provider:
-  #    server: "{{inventory_hostname}}"
-  #    user: '{{ lookup("env", "ANSIBLE_NET_USERNAME") }}'
-  #    password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") }}'
-  #    server_port: "443"
-  #    validate_certs: "no"
+  - name: Setup provider
+    set_fact:
+     provider:
+      server: "{{inventory_hostname}}"
+      user: '{{ lookup("env", "ANSIBLE_NET_USERNAME") }}'
+      password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") }}'
+      server_port: "443"
+      validate_certs: "no"
    
   - name: Query BIG-IP facts
     bigip_device_facts:
@@ -33,6 +33,8 @@
      groups: "appservers"
      pool_port: "{{item.split(':')[1]}}"
      pool_name: "{{pool_name}}"
+     bigip_username: '{{ lookup("env", "ANSIBLE_NET_USERNAME") }}'
+     bigip_password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") }}'
     loop: "{{bigip_facts.ltm_pools | json_query(query_string)}}"
     vars:
      query_string: "[?name=='{{pool_name}}'].members[*].name[]"
@@ -43,14 +45,14 @@
   serial: 1
 
   tasks:
-  #- name: Setup provider
-  #  set_fact:
-  #   provider:
-  #    server: "{{inventory_hostname}}"
-  #    user: '{{ lookup("env", "ANSIBLE_NET_USERNAME") }}'
-  #    password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") }}'
-  #    server_port: "443"
-  #    validate_certs: "no"
+  - name: Setup provider
+    set_fact:
+     provider:
+      server: "{{inventory_hostname}}"
+      user: "{{hostvars[inventory_hostname].bigip_username}}"
+      password: "{{hostvars[inventory_hostname].bigip_password}}"
+      server_port: "443"
+      validate_certs: "no"
 
   - name: Disable node pool member
     bigip_pool_member:
