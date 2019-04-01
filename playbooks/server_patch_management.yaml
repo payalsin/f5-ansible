@@ -1,16 +1,4 @@
----
-- name: Setting variables
-  hosts: all
-  gather_facts: no
-  
-  vars:
-   provider:
-      server: "{{inventory_hostname}}"
-      user: '{{ lookup("env", "ANSIBLE_NET_USERNAME") }}'
-      password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") }}'
-      server_port: "443"
-      validate_certs: "no"
-      
+---   
 - name: "Patching Application Servers"
   hosts: bigip
   gather_facts: false
