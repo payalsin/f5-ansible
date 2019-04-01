@@ -13,6 +13,7 @@
       password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") }}'
       server_port: "443"
       validate_certs: "no"
+    cacheable: true
 
   - name: Query BIG-IP facts
     bigip_device_facts:
@@ -43,14 +44,14 @@
   serial: 1
 
   tasks:
-  - name: Setup provider
-    set_fact:
-     provider:
-      server: "{{inventory_hostname}}"
-      user: '{{ lookup("env", "ANSIBLE_NET_USERNAME") }}'
-      password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") }}'
-      server_port: "443"
-      validate_certs: "no"
+  #- name: Setup provider
+  #  set_fact:
+  #   provider:
+  #    server: "{{inventory_hostname}}"
+  #    user: '{{ lookup("env", "ANSIBLE_NET_USERNAME") }}'
+  #    password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") }}'
+  #    server_port: "443"
+  #    validate_certs: "no"
 
   - name: Disable node pool member
     bigip_pool_member:
