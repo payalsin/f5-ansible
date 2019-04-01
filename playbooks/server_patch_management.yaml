@@ -13,7 +13,7 @@
       password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") }}'
       server_port: "443"
       validate_certs: "no"
-    cacheable: true
+     cacheable: true
 
   - name: Query BIG-IP facts
     bigip_device_facts:
