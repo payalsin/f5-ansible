@@ -64,7 +64,7 @@
       pool: "{{hostvars[inventory_hostname].pool_name}}"
 
   - pause:
-     seconds: 40
+     seconds: 30
      
   - name: Enable node pool member
     bigip_pool_member:
