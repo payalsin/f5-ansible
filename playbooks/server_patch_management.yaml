@@ -46,7 +46,7 @@
   - name: Setup provider
     set_fact:
      provider:
-      server: "10.192.73.219"
+      server: "{{inventory_hostname}}"
       user: "admin"
       password: "admin"
       server_port: "443"
@@ -61,7 +61,7 @@
       pool: "{{hostvars[inventory_hostname].pool_name}}"
 
   - pause:
-     seconds: 10
+     seconds: 40
      
   - name: Enable node pool member
     bigip_pool_member:
