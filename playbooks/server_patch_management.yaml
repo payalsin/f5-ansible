@@ -1,0 +1,72 @@
+---
+- name: "Patching Application Servers"
+  hosts: localhost
+  gather_facts: false
+  connection: local
+
+  tasks:
+  - name: Setup provider
+    set_fact:
+     provider:
+      server: "10.192.73.219"
+      user: "admin"
+      password: "admin"
+      server_port: "443"
+      validate_certs: "no"
+
+  - name: Query BIG-IP facts
+    bigip_device_facts:
+      provider: "{{provider}}"
+      gather_subset:
+       - ltm-pools
+    register: bigip_facts
+
+  - name: "Show members belonging to pool {{pool_name}}"
+    debug: "msg={{item}}"
+    loop: "{{bigip_facts.ltm_pools | json_query(query_string)}}"
+    vars:
+     query_string: "[?name=='{{pool_name}}'].members[*].name[]"
+
+  - name: Add hosts
+    add_host:
+     name: "{{item}}"
+     groups: "appservers"
+     pool_port: "{{item.split(':')[1]}}"
+     pool_name: "{{pool_name.user_input}}"
+    loop: "{{bigip_facts.ltm_pools | json_query(query_string)}}"
+    vars:
+     query_string: "[?name=='{{pool_name}}'].members[*].name[]"
+
+- hosts: appservers
+  gather_facts: no
+  connection: local
+  serial: 1
+
+  tasks:
+  - name: Setup provider
+    set_fact:
+     provider:
+      server: "10.192.73.219"
+      user: "admin"
+      password: "admin"
+      server_port: "443"
+      validate_certs: "no"
+
+  - name: Disable node pool member
+    bigip_pool_member:
+      provider: "{{provider}}"
+      state: "forced_offline"
+      name: "{{inventory_hostname}}"
+      port: "{{hostvars[inventory_hostname].pool_port}}"
+      pool: "{{hostvars[inventory_hostname].pool_name}}"
+
+  - pause:
+     seconds: 10
+     
+  - name: Enable node pool member
+    bigip_pool_member:
+      provider: "{{provider}}"
+      state: "enabled"
+      name: "{{inventory_hostname}}"
+      port: "{{hostvars[inventory_hostname].pool_port}}"
+      pool: "{{hostvars[inventory_hostname].pool_name}}"
