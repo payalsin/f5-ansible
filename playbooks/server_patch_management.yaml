@@ -1,6 +1,7 @@
 ---
 - name: Setting variables
   hosts: all
+  gather_facts: no
   
   vars:
    provider:
