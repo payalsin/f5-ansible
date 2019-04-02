@@ -8,7 +8,7 @@
   - name: Setup provider
     set_fact:
      provider:
-      server: "{{inventory_hostname}}"
+      server: "{{bigip}}"
       server_port: "443"
       validate_certs: "no"
    
