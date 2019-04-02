@@ -8,7 +8,7 @@
   - name: Setup provider
     set_fact:
      provider:
-      server: "{{bigip}}"
+      server: "{{inventory_hostname}}"
       server_port: "443"
       validate_certs: "no"
    
@@ -37,7 +37,7 @@
      query_string: "[?name=='{{pool_name}}'].members[*].name[]"
 
 - hosts: appservers
-  gather_facts: no
+  gather_facts: false
   connection: local
   serial: 1
 
