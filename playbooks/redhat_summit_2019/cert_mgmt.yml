@@ -36,8 +36,7 @@
   - name: UPDATE A VIRTUAL SERVER
     bigip_virtual_server:
      provider: "{{provider}}"
-     destination: "{{vip_ipaddr}}"
-     port: 443
+     name: "{{vip_name}}"
      profiles:
      - name: demo_profile
        context: client-side
