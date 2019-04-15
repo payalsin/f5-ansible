@@ -36,7 +36,6 @@
   - name: UPDATE A VIRTUAL SERVER
     bigip_virtual_server:
      provider: "{{provider}}"
-     description: "Secure web application"
      destination: "{{vip_ipaddr}}"
      port: 443
      profiles:
