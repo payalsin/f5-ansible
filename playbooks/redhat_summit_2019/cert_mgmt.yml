@@ -5,13 +5,6 @@
   connection: local
 
   tasks:
-  - set_fact:
-     vip_ipaddr: "{{vip_ip}}"
-    when: vip_ip is defined
-
-  - set_fact:
-     vip_ipaddr: "{{vip_new_ip}}"
-    when: vip_new_ip is defined
 
   - set_fact:
      provider:
