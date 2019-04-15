@@ -16,13 +16,13 @@
     bigip_ssl_certificate:
       provider: "{{provider}}"
       name: "demo_cert"
-      content: "{{ lookup('file', 'certificate.crt') }}"
+      content: "{{ lookup('file', cert) }}"
 
   - name: SSL cert upload
     bigip_ssl_key:
       provider: "{{provider}}"
       name: "demo_key"
-      content: "{{ lookup('file', 'privateKey.key') }}"
+      content: "{{ lookup('file', key) }}"
 
   - name: Create a client SSL profile with a cert/key/chain setting
     bigip_profile_client_ssl:
@@ -38,7 +38,7 @@
      provider: "{{provider}}"
      description: "Secure web application"
      name: "demo_https_vs"
-     destination: "10.168.59.102"
+     destination: "{{vip_ip}}"
      port: 443
      snat: "Automap"
      pool: "web_80_POOL"
@@ -52,7 +52,7 @@
      provider: "{{provider}}"
      description: "Redirect Virtual server"
      name: "demo_http_redirect_vs"
-     destination: "10.168.59.102"
+     destination: "{{vip_ip}}"
      port: 80
      profiles:
      - http
