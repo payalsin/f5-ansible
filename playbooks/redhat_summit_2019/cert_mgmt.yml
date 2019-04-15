@@ -33,28 +33,12 @@
       - cert: demo_cert
         key: demo_key
 
-  - name: CREATE A VIRTUAL SERVER
+  - name: UPDATE A VIRTUAL SERVER
     bigip_virtual_server:
      provider: "{{provider}}"
      description: "Secure web application"
-     name: "demo_https_vs"
      destination: "{{vip_ipaddr}}"
      port: 443
-     snat: "Automap"
-     pool: "web_80_POOL"
      profiles:
-     - http
      - name: demo_profile
        context: client-side
-
-  - name: CREATE A REDIRECT VIRTUAL SERVER
-    bigip_virtual_server:
-     provider: "{{provider}}"
-     description: "Redirect Virtual server"
-     name: "demo_http_redirect_vs"
-     destination: "{{vip_ipaddr}}"
-     port: 80
-     profiles:
-     - http
-     all_rules:
-     - _sys_https_redirect
