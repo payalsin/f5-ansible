@@ -5,6 +5,13 @@
   connection: local
 
   tasks:
+  - set_fact:
+     vip_ipaddr: "{{vip_ip}}"
+    when: vip_ip is defined
+
+  - set_fact:
+     vip_ipaddr: "{{vip_new_ip}}"
+    when: vip_new_ip is defined
 
   - set_fact:
      provider:
@@ -38,7 +45,7 @@
      provider: "{{provider}}"
      description: "Secure web application"
      name: "demo_https_vs"
-     destination: "{{vip_ip}}"
+     destination: "{{vip_ipaddr}}"
      port: 443
      snat: "Automap"
      pool: "web_80_POOL"
@@ -52,7 +59,7 @@
      provider: "{{provider}}"
      description: "Redirect Virtual server"
      name: "demo_http_redirect_vs"
-     destination: "{{vip_ip}}"
+     destination: "{{vip_ipaddr}}"
      port: 80
      profiles:
      - http
