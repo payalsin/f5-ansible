@@ -31,7 +31,7 @@
      name: "{{cert}}_{{key}}_profile"
      cert_key_chain:
       - cert: "{{cert}}"
-        key: ""{{key}}"
+        key: "{{key}}"
 
   - name: UPDATE A VIRTUAL SERVER
     bigip_virtual_server:
