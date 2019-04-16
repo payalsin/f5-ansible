@@ -15,28 +15,28 @@
   - name: SSL cert upload
     bigip_ssl_certificate:
       provider: "{{provider}}"
-      name: "demo_cert"
+      name: "{{cert}}"
       content: "{{ lookup('file', cert) }}"
 
   - name: SSL cert upload
     bigip_ssl_key:
       provider: "{{provider}}"
-      name: "demo_key"
+      name: "{{key}}"
       content: "{{ lookup('file', key) }}"
 
   - name: Create a client SSL profile with a cert/key/chain setting
     bigip_profile_client_ssl:
      provider: "{{provider}}"
      state: present
-     name: demo_profile
+     name: "{{cert}}_{{key}}_profile"
      cert_key_chain:
-      - cert: demo_cert
-        key: demo_key
+      - cert: "{{cert}}"
+        key: ""{{key}}"
 
   - name: UPDATE A VIRTUAL SERVER
     bigip_virtual_server:
      provider: "{{provider}}"
      name: "{{vip_name}}"
      profiles:
-     - name: demo_profile
+     - name: "{{cert}}_{{key}}_profile"
        context: client-side
