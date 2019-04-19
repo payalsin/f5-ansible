@@ -21,7 +21,7 @@
       peer_password: "{{ peer_password }}"
      
   - pause:
-      seconds: 15
+      seconds: 30
       
   - name: Add Device Group
     bigip_device_group:
@@ -31,7 +31,7 @@
       type: "sync-failover"
 
   - pause:
-      seconds: 15
+      seconds: 30
       
   - name: Add members to the device group
     bigip_device_group_member:
@@ -44,7 +44,7 @@
       - "{{peer_hostname}}"
 
   - pause:
-      seconds: 15
+      seconds: 30
       
   - name: Perform a config sync
     bigip_configsync_action:
