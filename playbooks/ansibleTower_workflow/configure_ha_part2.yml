@@ -12,6 +12,14 @@
       server_port: "443"
       validate_certs: "False"
       
+  - name: Device trust
+    bigip_device_trust:
+      provider: "{{provider}}"
+      peer_server: "{{ peer_server }}"
+      peer_hostname: "{{ peer_hostname }}"
+      peer_user: "{{ peer_user }}"
+      peer_password: "{{ peer_password }}"
+      
   - name: Add Device Group
     bigip_device_group:
       provider: "{{provider}}"
