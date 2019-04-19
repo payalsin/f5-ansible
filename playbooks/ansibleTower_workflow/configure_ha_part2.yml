@@ -44,7 +44,7 @@
       - "{{peer_hostname}}"
 
   - pause:
-      seconds: 30
+      seconds: 10
       
   - name: Perform a config sync
     bigip_configsync_action:
