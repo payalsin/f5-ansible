@@ -9,8 +9,6 @@ dns_servers:
  - '4.4.4.4'
 ip_version: 4
 
-username: "admin"
-password: "admin"
 hostname: bigipveha1.local
 
 ha_vlan_information:
