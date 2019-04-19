@@ -52,8 +52,3 @@ floating_selfip_information:
   address: '192.168.68.15'
   netmask: '255.255.255.0'
   vlan: "{{vlan_information[1]['name']}}"
-
-pool_name: "http_pool"
-vip_name: "app1_vip"
-vip_ip: "10.168.68.100"
-vip_port: "80"
