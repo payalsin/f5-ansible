@@ -1,0 +1,38 @@
+- name: Onboard BIG-IP
+  hosts: all
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+  - name: Setting up provider values
+    set_fact:
+     provider:
+      server: "{{inventory_hostname}}"
+      #user and password value is coming from Ansible Tower 'Network' crendentials
+      #user: "{{username}}"
+      #password: "{{password}}"
+      server_port: "443"
+      validate_certs: "False"
+
+  - name: Configure NTP server on BIG-IP
+    bigip_device_ntp:
+     provider: "{{provider}}"
+     ntp_servers: "{{ ntp_servers }}"
+
+  - name: Configure BIG-IP hostname
+    bigip_hostname:
+     provider: "{{provider}}"
+     hostname:  "{{ hostname }}"
+
+  - name: Manage SSHD setting on BIG-IP
+    bigip_device_sshd:
+      provider: "{{provider}}"
+      banner: "enabled"
+      banner_text: " {{ banner_text }}"
+
+  - name: Manage BIG-IP DNS settings
+    bigip_device_dns:
+     provider: "{{provider}}"
+     name_servers: "{{ dns_servers }}"
+     ip_version: "{{ ip_version }}"
