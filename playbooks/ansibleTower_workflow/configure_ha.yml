@@ -71,4 +71,4 @@
     bigip_configsync_action:
       provider: "{{provider}}"
       device_group: "deviceGrp"
-      sync_most_recent_to_device: yes
+      sync_device_to_group:"yes"
