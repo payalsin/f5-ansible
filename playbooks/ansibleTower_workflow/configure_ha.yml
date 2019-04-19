@@ -49,7 +49,7 @@
       peer_hostname: "{{ peer_hostname }}"
       peer_user: "{{ peer_user }}"
       peer_password: "{{ peer_password }}"
-
+    
   - name: Add Device Group
     bigip_device_group:
       provider: "{{provider}}"
