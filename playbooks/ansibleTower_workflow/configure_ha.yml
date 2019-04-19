@@ -1,0 +1,75 @@
+- name: Configure HA
+  hosts: ve_bigips
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+  - name: Setting up provider values
+    set_fact:
+     provider:
+      server: "{{inventory_hostname}}"
+      server_port: "443"
+      validate_certs: "False"
+
+  - name: Configure hostname
+    bigip_hostname:
+      provider: "{{provider}}"
+      hostname:  "{{hostname}}"
+
+  - name: Add HA VLAN(s)
+    bigip_vlan:
+      provider: "{{provider}}"
+      name: "{{item.name}}"
+      untagged_interfaces:
+      - "{{item.interface}}"
+    loop: "{{ha_vlan_information}}"
+
+  - name: Add HA SELF-IP(s)
+    bigip_selfip:
+     provider: "{{provider}}"
+     name: "{{item.name}}"
+     address: "{{item.address}}"
+     netmask: "{{item.netmask}}"
+     vlan: "{{item.vlan}}"
+    loop: "{{ ha_selfip }}"
+
+  - name: Config Sync/unicast/mirroring address
+    bigip_device_connectivity:
+      provider: "{{provider}}"
+      config_sync_ip: "{{ha_selfip[0]['address']}}"
+      mirror_primary_address: "{{ha_selfip[0]['address']}}"
+      unicast_failover:
+      - address: "{{ha_selfip[0]['address']}}"
+      - address: "{{inventory_hostname}}"
+
+  - name: Device trust
+    bigip_device_trust:
+      provider: "{{provider}}"
+      peer_server: "{{ peer_server }}"
+      peer_hostname: "{{ peer_hostname }}"
+      peer_user: "{{ peer_user }}"
+      peer_password: "{{ peer_password }}"
+
+  - name: Add Device Group
+    bigip_device_group:
+      provider: "{{provider}}"
+      name: "deviceGrp"
+      auto_sync: yes
+      type: "sync-failover"
+
+  - name: Add members to the device group
+    bigip_device_group_member:
+      provider: "{{provider}}"
+      device_group: "deviceGrp"
+      name: "{{ item }}"
+      validate_certs: False
+    loop:
+      - "{{hostname}}"
+      - "{{peer_hostname}}"
+
+  - name: Perform a config sync
+    bigip_configsync_action:
+      provider: "{{provider}}"
+      device_group: "deviceGrp"
+      sync_most_recent_to_device: yes
