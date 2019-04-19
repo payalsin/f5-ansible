@@ -1,0 +1,47 @@
+- name: Deploy ASM policy
+  hosts: ve_bigips
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+  - name: Setting up provider values
+    set_fact:
+     provider:
+      server: "{{inventory_hostname}}"
+      server_port: "443"
+      validate_certs: "False"
+  
+  - name: Create an LTM policy
+    bigip_policy:
+      provider: "{{provider}}"
+      name: asm-policy
+
+  - name: Import and activate ASM policy
+    bigip_asm_policy:
+      provider: "{{provider}}"
+      name: Demo
+      file: "asm_policy.xml"
+      active: yes
+      state: present
+    delegate_to: localhost
+
+  - name: Replace a forward action with an ASM action
+    bigip_policy_rule:
+      provider: "{{provider}}"
+      policy: asm-policy
+      name: rule1
+      actions:
+      - type: enable
+        asm_policy: Demo
+
+  #Attach ASM profile to the existing virtual server
+  - name: Add Virtual Server
+    bigip_virtual_server:
+      provider: "{{provider}}"
+      name: "{{vip_name}}"
+      profiles:
+       - http
+       - websecurity
+      policies:
+       - asm-policy
