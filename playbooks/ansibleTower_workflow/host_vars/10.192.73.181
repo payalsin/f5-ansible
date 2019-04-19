@@ -18,7 +18,7 @@ ha_vlan_information:
 
 ha_selfip:
 - name: "HA_SELF-IP"
-  address: "1.1.1.5"
+  address: "1.1.1.11"
   netmask: "255.255.255.0"
   vlan: "{{ha_vlan_information[0]['name']}}"
 
