@@ -1,5 +1,5 @@
 - name: Onboard BIG-IP
-  hosts: all
+  hosts: ve_bigips
   connection: local
   gather_facts: false
 
