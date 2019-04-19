@@ -1,0 +1,40 @@
+- name: Configure Network
+  hosts: ve_bigips
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+  - name: Setting up provider values
+    set_fact:
+     provider:
+      server: "{{inventory_hostname}}"
+      server_port: "443"
+      validate_certs: "False"
+
+  - name: Add VLAN(s)
+    bigip_vlan:
+      provider: "{{provider}}"
+      name: "{{item.name}}"
+      untagged_interfaces:
+      - "{{item.interface}}"
+    loop: "{{vlan_information}}"
+
+  - name: Add SELF-IP(s)
+    bigip_selfip:
+     provider: "{{provider}}"
+     name: "{{item.name}}"
+     address: "{{item.address}}"
+     netmask: "{{item.netmask}}"
+     vlan: "{{item.vlan}}"
+    loop: "{{ selfip_information }}"
+
+  - name: Add Floating SELF-IP(s)
+    bigip_selfip:
+     provider: "{{provider}}"
+     name: "{{item.name}}"
+     address: "{{item.address}}"
+     netmask: "{{item.netmask}}"
+     vlan: "{{item.vlan}}"
+     traffic_group: "traffic-group-1"
+    loop: "{{ floating_selfip_information }}"
