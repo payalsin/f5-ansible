@@ -34,11 +34,10 @@
      vlan: "{{item.vlan}}"
     loop: "{{ ha_selfip }}"
 
-  - name: Config Sync/unicast/mirroring address
+  - name: Config Sync/unicast
     bigip_device_connectivity:
       provider: "{{provider}}"
       config_sync_ip: "{{ha_selfip[0]['address']}}"
-      mirror_primary_address: "{{ha_selfip[0]['address']}}"
       unicast_failover:
       - address: "{{ha_selfip[0]['address']}}"
       - address: "{{inventory_hostname}}"
