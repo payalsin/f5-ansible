@@ -1,0 +1,22 @@
+- name: Add Device Group
+    bigip_device_group:
+      provider: "{{provider}}"
+      name: "deviceGrp"
+      auto_sync: yes
+      type: "sync-failover"
+
+  - name: Add members to the device group
+    bigip_device_group_member:
+      provider: "{{provider}}"
+      device_group: "deviceGrp"
+      name: "{{ item }}"
+      validate_certs: False
+    loop:
+      - "{{hostname}}"
+      - "{{peer_hostname}}"
+
+  - name: Perform a config sync
+    bigip_configsync_action:
+      provider: "{{provider}}"
+      device_group: "deviceGrp"
+      sync_device_to_group: "yes"
