@@ -22,7 +22,7 @@ ha_selfip:
   netmask: "255.255.255.0"
   vlan: "{{ha_vlan_information[0]['name']}}"
 
-peer_server: "10.192.73.219"
+peer_server: "10.192.73.181"
 peer_hostname: "bigipveha2.local"
 peer_user: "admin"
 peer_password: "admin"
