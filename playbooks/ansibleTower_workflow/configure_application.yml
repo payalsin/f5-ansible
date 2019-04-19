@@ -15,7 +15,7 @@
   - name: Create nodes
     bigip_node:
       provider: "{{provider}}"
-      host: "{{hostvars[item].private_ip}}"
+      host: "{{hostvars[item].inventory_hostname}}"
       name: "{{hostvars[item].inventory_hostname}}"
       monitors:
       - icmp
@@ -36,7 +36,7 @@
       provider: "{{provider}}"
       state: "present"
       name: "{{hostvars[item].inventory_hostname}}"
-      host: "{{hostvars[item].private_ip}}"
+      host: "{{hostvars[item].inventory_hostname}}"
       port: "80"
       pool: "{{pool_name}}"
     loop: "{{ groups['webservers'] }}"
