@@ -1,128 +1,114 @@
 - name: Onboard
-  hosts: localhost
+  hosts: all
   connection: local
   gather_facts: false
-  
-  #Variable file included
-  vars:
-   IPAddress: "10.192.73.246"
    
   vars_files:
     - var.yml
 
-  #Environment variables defined
-  environment:
-    F5_USER: "{{ username }}"
-    F5_PASSWORD: "{{ password }}"
-    F5_SERVER_PORT: "443"
-    F5_VALIDATE_CERTS: "False"
-  
   tasks:
-    
+
+  -name: Setting up provider values
+   set_fact:
+     provider:
+      server: "{{inventory_hostname}}"
+      server_port: "443"
+      validate_certs: "False"
+      
   #Onboard the BIG-IP (NTP/Hostname/SSHD/DNS)
   - name: Configure NTP server on BIG-IP
     bigip_device_ntp:
-      server: "{{ IPAddress }}"
+      provider: "{{provider}}"
       ntp_servers: "{{ ntp_servers }}"
-    delegate_to: localhost
 
   - name: Configure BIG-IP hostname
     bigip_hostname:
-      server: "{{ IPAddress }}"
+      provider: "{{provider}}"
       hostname: "{{ hostname }}"
-    delegate_to: localhost
 
   - name: Manage SSHD setting on BIG-IP
     bigip_device_sshd:
-      server: "{{ IPAddress }}"
+      provider: "{{provider}}"
       banner: "enabled"
       banner_text: " {{ banner_text }}"
-    delegate_to: localhost
 
   - name: Manage BIG-IP DNS settings
     bigip_device_dns:
-     server: "{{ IPAddress }}"
+     provider: "{{provider}}"
      name_servers: "{{ dns_servers }}"
-    delegate_to: localhost
 
-#Network the BIG-IP (VLANS/Self-IP configuration)
+    #Network the BIG-IP (VLANS/Self-IP configuration)
   - name: Configure VLANs on the BIG-IP
     bigip_vlan:
-     server: "{{ IPAddress }}"
+     provider: "{{provider}}"
      name: "{{ item.name }}"
      tag: "{{ item.tag }}"
      untagged_interface: "{{ item.interface }}"
     with_items: "{{ vlan_information }}"
-    delegate_to: localhost
-
+    
   - name: Configure SELF-IPs on the BIG-IP
     bigip_selfip:
-     server: "{{ IPAddress }}"
+     provider: "{{provider}}"
      name: "{{ item.name }}"
      address: "{{ item.address }}"
      netmask: "{{ item.netmask }}"
      vlan: "{{ item.vlan }}"
      allow_service: "{{item.allow_service}}"
     with_items: "{{ selfip_information }}"
-    delegate_to: localhost
-
-#Deploy ASM policy
+    
+    #Deploy ASM policy
   - name: Create an LTM policy
     bigip_policy:
-      server: "{{ IPAddress }}"
+      provider: "{{provider}}"
       name: asm-policy
 
   - name: Import and activate ASM policy
     bigip_asm_policy:
-      server: "{{ IPAddress }}"
+      provider: "{{provider}}"
       name: Demo
       file: "asm_policy.xml"
       active: yes
       state: present
-    delegate_to: localhost
-
+    
   - name: Replace a forward action with an ASM action
     bigip_policy_rule:
-      server: "{{ IPAddress }}"
+      provider: "{{provider}}"
       policy: asm-policy
       name: rule1
       actions:
       - type: enable
         asm_policy: Demo
 
-#Create VS/Pool/members
+  #Create VS/Pool/members
   - name: Create nodes
     bigip_node:
-      server: "{{ IPAddress }}"
+      provider: "{{provider}}"
       host: "{{item.host}}"
       name: "{{item.host}}"
     with_items: "{{pool_members}}"
-    delegate_to: localhost
-
+  
   - name: Create pool
     bigip_pool:
-      server: "{{ IPAddress }}"
+      provider: "{{provider}}"
       state: "present"
       name: "http-pool"
       lb_method: "round-robin"
       monitors: "/Common/http"
       monitor_type: "and_list"
-    delegate_to: localhost
-
+  
   - name: Add Pool members
     bigip_pool_member:
-      server: "{{ IPAddress }}"
+      provider: "{{provider}}"
       name: "{{item.host}}"
       host: "{{item.host}}"
       port: "{{item.port}}"
       pool: "http-pool"
     with_items: "{{pool_members}}"
-    delegate_to: localhost
-
-  #Attach ASM profile to the virtual server amongst other configurations
+  
+    #Attach ASM profile to the virtual server amongst other configurations
   - name: Add Virtual Server
     bigip_virtual_server:
-      server: "{{ IPAddress }}"
+      provider: "{{provider}}"
       name: "{{vip_name}}"
       destination: "{{vip_ip}}"
       port: "{{vip_port}}"
@@ -133,4 +119,3 @@
        - websecurity
       policies:
        - asm-policy
-    delegate_to: localhost
