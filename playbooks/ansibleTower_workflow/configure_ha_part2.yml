@@ -1,4 +1,18 @@
-- name: Add Device Group
+- name: Configure HA
+  hosts: ve_bigips
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+  - name: Setting up provider values
+    set_fact:
+     provider:
+      server: "{{inventory_hostname}}"
+      server_port: "443"
+      validate_certs: "False"
+      
+  - name: Add Device Group
     bigip_device_group:
       provider: "{{provider}}"
       name: "deviceGrp"
