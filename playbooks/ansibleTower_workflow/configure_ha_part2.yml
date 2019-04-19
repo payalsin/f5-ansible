@@ -20,7 +20,7 @@
       peer_user: "{{ peer_user }}"
       peer_password: "{{ peer_password }}"
      
-   - pause:
+  - pause:
       seconds: 15
       
   - name: Add Device Group
