@@ -1,5 +1,5 @@
 - name: Deploy ASM policy
-  hosts: ve_bigips
+  hosts: all
   connection: local
   gather_facts: false
 
@@ -24,7 +24,6 @@
       file: "asm_policy.xml"
       active: yes
       state: present
-    delegate_to: localhost
 
   - name: Replace a forward action with an ASM action
     bigip_policy_rule:
