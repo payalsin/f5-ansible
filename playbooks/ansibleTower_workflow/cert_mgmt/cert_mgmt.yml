@@ -64,5 +64,5 @@
        context: client-side
      - http
      - websecurity
-      policies:
-      - asm-policy
+     policies:
+     - asm-policy
