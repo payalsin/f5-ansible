@@ -1,5 +1,5 @@
 ---
-- name: Cert Management on BIG-IP
+- name: Security profile mgmt on BIG-IP
   hosts: all
   gather_facts: false
   connection: local
