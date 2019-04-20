@@ -1,0 +1,24 @@
+- name: Cert Management on BIG-IP
+  hosts: all
+  gather_facts: false
+  connection: local
+
+  vars:
+    certificate: "{{ lookup('file', cert) | replace('\n', '\\n') }}"
+    private_key: "{{ lookup('file', key) | replace('\n', '\\n') }}"
+
+  tasks:
+
+  - name: Send As3 Payload
+    uri:
+      url: "https://{{inventory_hostname/mgmt/shared/appsvcs/declare"
+      method: POST
+      body: "{{ lookup('template', 'as3.j2', split_lines=False) }}"
+      status_code: 200
+      timeout: 300
+      body_format: json
+      force_basic_auth: yes
+      user: "admin"
+      password: "admin"
+      validate_certs: no
+    delegate_to: localhost
