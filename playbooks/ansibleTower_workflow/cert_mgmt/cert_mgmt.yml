@@ -33,6 +33,28 @@
       - cert: "{{cert}}"
         key: "{{key}}"
 
+  - name: Create an LTM policy
+    bigip_policy:
+      provider: "{{provider}}"
+      name: asm-policy
+
+  - name: Import and activate ASM policy
+    bigip_asm_policy:
+      provider: "{{provider}}"
+      name: Demo
+      file: "asm_policy.xml"
+      active: yes
+      state: present
+
+  - name: Replace a forward action with an ASM action
+    bigip_policy_rule:
+      provider: "{{provider}}"
+      policy: asm-policy
+      name: rule1
+      actions:
+      - type: enable
+        asm_policy: Demo
+        
   - name: UPDATE A VIRTUAL SERVER
     bigip_virtual_server:
      provider: "{{provider}}"
@@ -40,3 +62,7 @@
      profiles:
      - name: "{{cert}}_{{key}}_profile"
        context: client-side
+     - http
+     - websecurity
+      policies:
+       - asm-policy
