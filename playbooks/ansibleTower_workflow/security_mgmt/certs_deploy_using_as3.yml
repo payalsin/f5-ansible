@@ -1,5 +1,5 @@
 - name: Cert Management on BIG-IP
-  hosts: all
+  hosts: bigips
   gather_facts: false
   connection: local
 
