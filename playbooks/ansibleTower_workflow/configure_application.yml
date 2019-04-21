@@ -46,8 +46,20 @@
       provider: "{{provider}}"
       name: "{{vip_name}}"
       destination: "{{vip_ip}}"
-      port: "{{vip_port}}"
-      all_profiles:
-       - http
+      port: "443"
+      profiles:
+      - http
       pool: "{{pool_name}}"
       snat: "automap"
+  
+   - name: Create a redirect virtual serbver
+     bigip_virtual_server:
+      provider: "{{provider}}"
+      description: "Redirect Virtual server"
+      name: "{{vip_name}}_redirect"
+      destination: "{{vip_ip}}"
+      port: 80
+      profiles:
+      - http
+      all_rules:
+      - _sys_https_redirect
