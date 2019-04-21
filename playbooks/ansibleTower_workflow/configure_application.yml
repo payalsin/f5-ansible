@@ -49,6 +49,7 @@
       port: "443"
       profiles:
       - http
+      - clientssl
       pool: "{{pool_name}}"
       snat: "automap"
   
