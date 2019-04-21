@@ -53,8 +53,8 @@
       pool: "{{pool_name}}"
       snat: "automap"
   
-   - name: Create a redirect virtual serbver
-     bigip_virtual_server:
+  - name: Create a redirect virtual serbver
+    bigip_virtual_server:
       provider: "{{provider}}"
       description: "Redirect Virtual server"
       name: "{{vip_name}}_redirect"
