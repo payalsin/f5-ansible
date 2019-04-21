@@ -11,10 +11,12 @@
 
   - name: Send As3 Payload
     uri:
-      url: "https://{{inventory_hostname/mgmt/shared/appsvcs/declare"
+      url: "https://{{inventory_hostname}}/mgmt/shared/appsvcs/declare"
       method: POST
       body: "{{ lookup('template', 'as3.j2', split_lines=False) }}"
-      status_code: 200
+      status_code: 
+      - 200
+      - 202
       timeout: 300
       body_format: json
       force_basic_auth: yes
