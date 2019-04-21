@@ -9,7 +9,7 @@
 
   tasks:
 
-  - name: Send As3 Payload
+  - name: Deploy applicating using AS3
     uri:
       url: "https://{{inventory_hostname}}/mgmt/shared/appsvcs/declare"
       method: POST
