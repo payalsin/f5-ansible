@@ -5,12 +5,12 @@
     "declaration": {
         "class": "ADC",
         "schemaVersion": "3.2.0",
-        "id": "exampleid",
-        "label": "example label",
-        "remark": "example remark",
+        "id": "id",
+        "label": "label",
+        "remark": "remark",
         "secure":{
             "class": "Tenant",
-            "web_app": {
+            "{{vip_name}}": {
                 "class": "Application",
                 "template": "https",
                 "serviceMain": {
@@ -19,7 +19,7 @@
                         "{{ vip_ip }}"
                     ],
                     "virtualPort": 443,
-                    "pool": "app_pool",
+                    "pool": "{{pool_name}}",
                     "serverTLS": "as3_webtls",
                     "snat": "auto"
                 },
@@ -36,10 +36,22 @@
                     "certificate": "{{certificate}}",
                     "privateKey": "{{private_key}}"
                 },
-                "app_pool": {
+                "{{pool_name}}": {
                     "class": "Pool",
                     "monitors": [
                         "http"
+                    ],
+                    "members": [
+                        {
+                            "servicePort": 80,
+                            "serverAddresses": [
+                                {% set comma = joiner(",") %}
+                                {% for member in groups['webservers'] %}
+                                    {{comma()}} "{{  member  }}"
+                                {% endfor %}
+
+                            ]
+                        }
                     ]
                 }
             }
