@@ -1,0 +1,78 @@
+- name: Dynamic end point attach/dettach
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    epg_members: []
+    pool_members: []
+    pool_members_ip: []
+
+  tasks:
+  - name: Setup provider
+    set_fact:
+     provider:
+      server: "{{inventory_hostname}}"
+      server_port: "443"
+      validate_certs: "no"
+
+  - name: Get VLAN information from a Physical Logical Device Cluster
+    aci_rest:
+      action: "get"
+      uri: "/api/node/mo/uni/tn-{{tenant_name}}/ap-{{app_profile_name}}/epg-{{epg_name}}.json?query-target=subtree&target-subtree-class=fvIp"
+      host: {{apic_ip}}
+      username: {{apic_username}}
+      password: {{apic_password}}
+      validate_certs: "false"
+    register: eps
+
+  - set_fact:
+     epg_members="{{epg_members + [item]}}"
+    loop: "{{eps | json_query(query_string)}}"
+    vars:
+     query_string: "imdata[*].fvIp.attributes.addr"
+
+  - name: Adding Pool members
+    bigip_pool_member:
+      provider: "{{provider}}"
+      state: "present"
+      name: "{{item}}"
+      host: "{{item}}"
+      port: "{{pool_port}}"
+      pool: "{{pool_name}}"
+    loop: "{{epg_members}}"
+
+  - name: Query BIG-IP facts
+    bigip_device_facts:
+      provider: "{{provider}}"
+      gather_subset:
+       - ltm-pools
+    register: bigip_facts
+
+  - name: "Show members belonging to pool {{pool_name}}"
+    set_fact:
+     pool_members="{{pool_members + [item]}}"
+    loop: "{{bigip_facts.ltm_pools | json_query(query_string)}}"
+    vars:
+     query_string: "[?name=='{{pool_name}}'].members[*].name[]"
+
+  - set_fact:
+     pool_members_ip: "{{pool_members_ip + [item.split(':')[0]]}}"
+    loop: "{{pool_members}}"
+
+  - debug: "msg={{pool_members_ip}}"
+
+  - set_fact:
+     members_to_be_deleted: "{{ pool_members_ip | difference(epg_members) }}"
+
+  - debug: "msg={{members_to_be_deleted}}"
+
+  - name: Delete Pool members
+    bigip_pool_member:
+      provider: "{{provider}}"
+      state: "absent"
+      name: "{{item}}"
+      port: "{{pool_port}}"
+      pool: "{{pool_name}}"
+      preserve_node: yes
+    loop: "{{members_to_be_deleted}}"
