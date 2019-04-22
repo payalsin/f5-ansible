@@ -20,9 +20,9 @@
     aci_rest:
       action: "get"
       uri: "/api/node/mo/uni/tn-{{tenant_name}}/ap-{{app_profile_name}}/epg-{{epg_name}}.json?query-target=subtree&target-subtree-class=fvIp"
-      host: {{apic_ip}}
-      username: {{apic_username}}
-      password: {{apic_password}}
+      host: "{{apic_ip}}"
+      username: "{{apic_username}}"
+      password: "{{apic_password}}"
       validate_certs: "false"
     register: eps
 
