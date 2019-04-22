@@ -38,3 +38,5 @@
      vlan: "{{item.vlan}}"
      traffic_group: "traffic-group-1"
     loop: "{{ floating_selfip_information }}"
+    loop_control:
+      pause: 5  
