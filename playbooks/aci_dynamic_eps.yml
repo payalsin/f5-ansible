@@ -26,13 +26,14 @@
       validate_certs: "false"
     register: eps
 
-  - set_fact:
+  - name: Create a list of end points learned
+    set_fact:
      epg_members="{{epg_members + [item]}}"
     loop: "{{eps | json_query(query_string)}}"
     vars:
      query_string: "imdata[*].fvIp.attributes.addr"
 
-  - name: Adding Pool members to pool {{pool_name}}
+  - name: Adding end points learned as pool members to pool {{pool_name}}
     bigip_pool_member:
       provider: "{{provider}}"
       state: "present"
@@ -62,7 +63,8 @@
 
   - debug: "msg={{pool_members_ip}}"
 
-  - set_fact:
+  - name: Set a list of pool members to be deleted
+    set_fact:
      members_to_be_deleted: "{{ pool_members_ip | difference(epg_members) }}"
 
   - debug: "msg={{members_to_be_deleted}}"
