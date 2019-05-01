@@ -1,5 +1,5 @@
 - name: Dynamic end point attach/dettach
-  hosts: bigips
+  hosts: localhost
   connection: local
   gather_facts: false
 
@@ -12,7 +12,9 @@
   - name: Setup provider
     set_fact:
      provider:
-      server: "{{inventory_hostname}}"
+      server: "{{bigip_ip}}"
+      user: "{{bigip_username}}"
+      password: "{{bigip_password}}"
       server_port: "443"
       validate_certs: "no"
 
