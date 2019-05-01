@@ -16,7 +16,7 @@
       server_port: "443"
       validate_certs: "no"
 
-  - name: Get VLAN information from a Physical Logical Device Cluster
+  - name: Get End points learned on EPG {{epg_name}}
     aci_rest:
       action: "get"
       uri: "/api/node/mo/uni/tn-{{tenant_name}}/ap-{{app_profile_name}}/epg-{{epg_name}}.json?query-target=subtree&target-subtree-class=fvIp"
@@ -32,7 +32,7 @@
     vars:
      query_string: "imdata[*].fvIp.attributes.addr"
 
-  - name: Adding Pool members
+  - name: Adding Pool members to pool {{pool_name}}
     bigip_pool_member:
       provider: "{{provider}}"
       state: "present"
@@ -49,7 +49,7 @@
        - ltm-pools
     register: bigip_facts
 
-  - name: "Show members belonging to pool {{pool_name}}"
+  - name: "Show ALL members belonging to pool {{pool_name}}"
     set_fact:
      pool_members="{{pool_members + [item]}}"
     loop: "{{bigip_facts.ltm_pools | json_query(query_string)}}"
