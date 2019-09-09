@@ -49,3 +49,5 @@ You are encouraged to pick one of the use cases below and.or come up with your o
 - Upload and attach iRules
 - Display relevant information about BIG-IP (software version/hardware etc.)
 - Parse virtual server information and display the default pool hence and pool members that belong to the pool
+
+Take a look at `Ansible module <https://docs.ansible.com/ansible/latest/modules/list_of_network_modules.html#f5>`_ available and get started 
