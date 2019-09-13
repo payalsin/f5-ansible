@@ -1,7 +1,7 @@
-.. contents:: :depth: 3
-
 Build a Role Lab
 ================
+
+.. contents:: :depth: 3
 
 What is an Ansible Role
 -----------------------
