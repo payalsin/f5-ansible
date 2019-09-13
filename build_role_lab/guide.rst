@@ -1,4 +1,4 @@
-.. contents:: :depth: 2
+.. contents:: :depth: 3
 
 Build a Role Lab
 ================
@@ -39,30 +39,30 @@ Get started on creating roles
 
 There is an ansible-galaxy init command that can be used to create the base directory structure for writing a role. All the directories dont have to be utilized.
 
-```
-ansible-galaxy init role_name
-```
+.. code:: rst
+  
+  ansible-galaxy init role_name
 
 The above will create the following directory structure in the current working directory:
 
-```
-role_name/
-    README.md
-    .travis.yml
-    defaults/
+.. code:: rst
+
+   role_name/
+     README.md
+     .travis.yml
+     defaults/
         main.yml
-    files/
-    handlers/
+     files/
+     handlers/
         main.yml
-    meta/
+     meta/
         main.yml
-    templates/
-    tests/
+     templates/
+     tests/
         inventory
         test.yml
-    vars/
+     vars/
         main.yml
-```
 
 - Each directory will have a 'main.yml'.
 - The tasks directory also has a main.yml file which gets executed/called automatically when a role is referenced
@@ -91,26 +91,26 @@ There is more that one way to reference a role within a playbooks.
 
 Classic (original way) - ansible will check each roles directory for tasks/handlers/vars/default vars and other objects to add for the current host within the playbook.
 
-```
----
-- hosts: webservers
-  roles:
-    - common
-    - webservers
+.. code:: rst
 
-```
+   ---
+   - hosts: webservers
+     roles:
+      - common
+      - webservers
 
 Use Roles inline (2.4+)
 
-```
----
-- hosts: webservers
-  tasks:
-  - import_role:
-      name: example
-  - include_role:
-      name: example
-``` 
+.. code:: rst
+
+   ---
+   - hosts: webservers
+     tasks:
+     - import_role:
+       name: example
+     - include_role:
+       name: example
+       
 - Import (static) vs Include (dynamic)
   - Import tasks are treated more like part of the actual playbook.
   - Include tasks are added when the playbook gets to those tasks.
@@ -118,15 +118,16 @@ Use Roles inline (2.4+)
   - Cannot reference/view objects within include tasks such as (--list-tasks , --start-at-task, etc)
 
 Roles can use vars, tags, and conditionals just like other tasks
-```
-- hosts: webservers
-  tasks:
-  - include_role:
-      name: foo_app_instance
-    vars:
-      dir: '/opt/a'
-      app_port: 5000
-```
+
+.. code:: rst
+
+   - hosts: webservers
+     tasks:
+     - include_role:
+        name: foo_app_instance
+       vars:
+        dir: '/opt/a'
+        app_port: 5000
 
 Creating and executing playbook using role
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
