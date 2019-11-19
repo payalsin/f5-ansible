@@ -54,11 +54,11 @@ Deploy 1 vCMP guest
 
 The code above deploys 1 vCMP guest. If you have multiple vCMP guests that need to be deployed there are a number of ways to do that:
 - A variable file can be used to store information on each vCMP guest and then referenced within the playbook
-- Using a loop within the task itself - Let's take a look at this option
+- Using a loop within the task itself - **Let's take a look at this option**
 
 **Example playbook: vcmp_host_mgmt.yml**
 
-Deploy mulitple vCMP guests using a variable file
+Deploy mulitple vCMP guests using the async operationa
 
 ```
 - name: vCMP MGMT
@@ -118,7 +118,7 @@ Click here to learn more about the async and async_status module
 
 **Part2: Software upgrade**
 
-Now once we have the vCMP guests deployed let's consider a scenrio where now a new build is out with a new fix on the vCMP guest.
+Now once we have the vCMP guests deployed let's consider a scenario where a new software BIG-IP build is out with a new fix for the vCMP guest.
 
 **Example playbook: vcmp_guest_mgmt.yml**
 
@@ -134,9 +134,9 @@ Now once we have the vCMP guests deployed let's consider a scenrio where now a n
   - name: Setup provider
     set_fact:
      vcmp_guest_creds:
-      server: "10.192.73.85"
+      server: "10.192.xx.xx"
       user: "admin"
-      password: "!2dmin12345!"
+      password: "admin"
       server_port: "443"
       validate_certs: "no"
 
@@ -161,7 +161,6 @@ Now once we have the vCMP guests deployed let's consider a scenrio where now a n
       msg: "{{volume.user_input}} is not a valid volume format"
     when: volume.user_input is not regex("HD[1-9].[1-9]")
 
-
   - name: Ensure image is activated and booted to specified volume
     bigip_software_install:
      image: "{{image}}"
@@ -171,8 +170,8 @@ Now once we have the vCMP guests deployed let's consider a scenrio where now a n
 
 ```
 
-The upgrade procedure for vCMP guests is not just applicable for vCMP, this process can be used for a virtual edition or any hardware appliance of BIG-IP as well. Infact the same process is used on vCMP hosts as well. 
+The upgrade procedure for vCMP guests is not just applicable for vCMP, this process can be used for a virtual edition or any hardware appliance of BIG-IP. Infact the same process is used on vCMP hosts as well. 
 
 List of modules used in the playbooks can be found at:
 
-Happy auotmating !!
+Happy automating !!
