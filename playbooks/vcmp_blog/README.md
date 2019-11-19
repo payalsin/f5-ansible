@@ -147,6 +147,7 @@ Now once we have the vCMP guests deployed let's consider a scenario where a new 
       image: "/root/images/{{image}}"
       provider: "{{vcmp_guest_creds}}"
 
+  # This command will list of the volumes available and the software present on each volume
   - name: run show version on remote devices
     bigip_command:
      commands: show sys software
@@ -155,14 +156,17 @@ Now once we have the vCMP guests deployed let's consider a scenario where a new 
 
   - debug: msg="{{result.stdout_lines}}"
 
+  # Enter the volume from above to which you want to install the software
   - pause:
       prompt: "Choose the volume for software installation (Example format HD1.2)"
     register: volume
 
+  # If the format of the volume entered does not match below the playbook will fail
   - fail:
       msg: "{{volume.user_input}} is not a valid volume format"
     when: volume.user_input is not regex("HD[1-9].[1-9]")
 
+  # This task will install the software and then boot the BIG-IP to that specific volume
   - name: Ensure image is activated and booted to specified volume
     bigip_software_install:
      image: "{{image}}"
