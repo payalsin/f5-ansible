@@ -2,7 +2,7 @@
 
 I am going to start with a definition of vCMP since many use it but don’t know what it stands for: **Virtual Clustered Multiprocessing™ (vCMP®)** is a feature of the BIG-IP® system that allows you to provision and manage multiple, hosted instances of the BIG-IP software on a single hardware platform.
 
-With managing multiple instances on a single platform there is almost certainly repetitiveness of tasks that are performed. The vCMP platform is no exception. The vCMP host can consist of multiple slots and multiple guests can be distributed among those slots. There are different ways to provision vCMP guests on a host depending on the hardware specifications of the host. I wont go into details here but click here for great article to guide you on vCMP guest distribution on vCMP hosts.
+With managing multiple instances on a single platform there is almost certainly repetitiveness of tasks that are performed. The vCMP platform is no exception. The vCMP host can consist of multiple slots and multiple guests can be distributed among those slots. There are different ways to provision vCMP guests on a host depending on the hardware specifications of the host. I wont go into details here but [click here for great resource to guide you on vCMP guest distribution on vCMP hosts].(https://support.f5.com/csp/article/K14727)
 
 In this article I am going to talk about how you can use Ansible to deploy vCMP guests and also talk about how you can upgrade software on those guests.
 
@@ -58,7 +58,7 @@ The code above deploys 1 vCMP guest. If you have multiple vCMP guests that need 
 
 **Example playbook: vcmp_host_mgmt.yml**
 
-Deploy mulitple vCMP guests using the async operationa
+Deploy mulitple vCMP guests using the async operation
 
 ```
 - name: vCMP MGMT
@@ -114,11 +114,13 @@ Deploy mulitple vCMP guests using the async operationa
     with_items: "{{ _create_vcmp_instances.results }}"
 
  ```
-Click here to learn more about the async and async_status module
+Click here to learn more about the [async](https://blog.crisp.se/2018/01/27/maxwenzin/how-to-run-ansible-tasks-in-parallel) and [async_status module](https://docs.ansible.com/ansible/latest/user_guide/playbooks_async.html)
 
 **Part2: Software upgrade**
 
-Now once we have the vCMP guests deployed let's consider a scenario where a new software BIG-IP build is out with a new fix for the vCMP guest.
+Now once we have the vCMP guests deployed let's consider a scenario where a new software BIG-IP build is out with a fix for the vCMP guest.
+
+[Go through certain considerations](https://support.f5.com/csp/article/K13748) while upgrading vCMP guests.
 
 **Example playbook: vcmp_guest_mgmt.yml**
 
@@ -170,8 +172,10 @@ Now once we have the vCMP guests deployed let's consider a scenario where a new 
 
 ```
 
-The upgrade procedure for vCMP guests is not just applicable for vCMP, this process can be used for a virtual edition or any hardware appliance of BIG-IP. Infact the same process is used on vCMP hosts as well. 
+The upgrade procedure for vCMP guests is not just applicable for vCMP, this process can be used for a virtual edition or any hardware appliance of BIG-IP. Infact the same process is used on vCMP hosts as well.
 
-List of modules used in the playbooks can be found at:
+Although for vCMP hosts there are [other factors to consider](https://support.f5.com/csp/article/K15930#p17) before performing an upgrade.
+
+[List of modules used in the playbooks](https://docs.ansible.com/ansible/latest/modules/list_of_network_modules.html#f5)
 
 Happy automating !!
