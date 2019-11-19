@@ -7,10 +7,10 @@ With managing multiple instances on a single platform there is almost certainly 
 In this article I am going to talk about how you can use Ansible to deploy vCMP guests and also talk about how you can upgrade software on those guests.
 
 **Part1: Deploy vCMP guests**
-- The BIG-IP image is downloaded and accessible in a directory (/root/images) local from where the ansible playbook is being run 
+The BIG-IP image is downloaded and accessible in a directory (/root/images) local from where the ansible playbook is being run 
 
-**vcmp_host_mgmt.yml**
-- Deploy 1 vCMP guest
+**Example playbooks: vcmp_host_mgmt.yml**
+Deploy 1 vCMP guest
 
 ```
 - name: vCMP MGMT
@@ -54,8 +54,8 @@ The code above deploys 1 vCMP guest. If you have multiple vCMP guests that need 
 - A variable file can be used to store information on each vCMP guest and then referenced within the playbook
 - Using a loop within the task itself - Let's take a look at this option
 
-**vcmp_host_mgmt.yml**
-- Deploy mulitple vCMP guests using a variable file
+**Example playbook: vcmp_host_mgmt.yml**
+Deploy mulitple vCMP guests using a variable file
 
 ```
 - name: vCMP MGMT
@@ -111,22 +111,64 @@ The code above deploys 1 vCMP guest. If you have multiple vCMP guests that need 
     with_items: "{{ _create_vcmp_instances.results }}"
 
  ```
+Click here to learn more about the async and async_status module
 
-Now once we have the vCMP guests deployed let's consider a scenrio where now a new build is out with a new fix on the vCMP host.
+**Part2: Software upgrade**
 
-**Part2: Softwate upgrade**
+Now once we have the vCMP guests deployed let's consider a scenrio where now a new build is out with a new fix on the vCMP guest.
 
-Example playbook:
+**Example playbook: vcmp_guest_mgmt.yml**
+
 ```
+- name: vCMP guest MGMT
+  hosts: localhost
+  connection: local
+
+  vars:
+   image: "BIGIP-14.1.2.2-0.0.4.iso"
+
+  tasks:
+  - name: Setup provider
+    set_fact:
+     vcmp_guest_creds:
+      server: "10.192.73.85"
+      user: "admin"
+      password: "!2dmin12345!"
+      server_port: "443"
+      validate_certs: "no"
+
+  - name: Upload software on vCMP guest
+    bigip_software_image:
+      image: "/root/images/{{image}}"
+      provider: "{{vcmp_guest_creds}}"
+
+  - name: run show version on remote devices
+    bigip_command:
+     commands: show sys software
+     provider: "{{vcmp_guest_creds}}"
+    register: result
+
+  - debug: msg="{{result.stdout_lines}}"
+
+  - pause:
+      prompt: "Choose the volume for software installation (Example format HD1.2)"
+    register: volume
+
+  - fail:
+      msg: "{{volume.user_input}} is not a valid volume format"
+    when: volume.user_input is not regex("HD[1-9].[1-9]")
+
+
+  - name: Ensure image is activated and booted to specified volume
+    bigip_software_install:
+     image: "{{image}}"
+     state: activated
+     volume: "{{volume.user_input}}"
+     provider: "{{vcmp_guest_creds}}"
+
 ```
 
-Next let's also look at the option of upgrading the vCMP guests:
-
-Example playbook:
-```
-```
-
-The upgrade procedure for vCMP guests is not just applicable for vCMP, this process can be used for a virtual edition or any hardware appliance of BIG-IP as well.
+The upgrade procedure for vCMP guests is not just applicable for vCMP, this process can be used for a virtual edition or any hardware appliance of BIG-IP as well. Infact the same process is used on vCMP hosts as well. 
 
 List of modules used in the playbooks can be found at:
 
