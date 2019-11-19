@@ -176,6 +176,6 @@ The upgrade procedure for vCMP guests is not just applicable for vCMP, this proc
 
 Although for vCMP hosts there are [other factors to consider](https://support.f5.com/csp/article/K15930#p17) before performing an upgrade.
 
-[List of modules used in the playbooks](https://docs.ansible.com/ansible/latest/modules/list_of_network_modules.html#f5)
+Code above tested with Ansible 2.9 and [a subset of modules used in the playbooks from the list of complete F5 ansible modules available](https://docs.ansible.com/ansible/latest/modules/list_of_network_modules.html#f5)
 
 Happy automating !!
