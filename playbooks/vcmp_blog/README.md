@@ -96,8 +96,20 @@ The code above deploys 1 vCMP guest. If you have multiple vCMP guests that need 
     with_items: 
     - { name: 'vCMP85', ip: '10.192.73.85' }
     - { name: 'vcMP86', ip: '10.192.73.86' }
-    async: 60
-    poll: 5
+    register: _create_vcmp_instances
+    # This will run the tasks in parallel and spin the vCMP guests simultaneously
+    async: 900
+    poll: 0
+
+  - name: Wait for tasks creation above to finish
+    async_status:
+      jid: "{{ item.ansible_job_id }}"
+    register: _jobs
+    until: _jobs.finished
+    delay: 10  # Check every 10 seconds. Adjust as you like.
+    retries: 85  # Retry up to 10 times. Adjust as needed.
+    with_items: "{{ _create_vcmp_instances.results }}"
+
  ```
 
 Now once we have the vCMP guests deployed let's consider a scenrio where now a new build is out with a new fix on the vCMP host.
