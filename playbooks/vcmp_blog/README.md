@@ -7,9 +7,11 @@ With managing multiple instances on a single platform there is almost certainly 
 In this article I am going to talk about how you can use Ansible to deploy vCMP guests and also talk about how you can upgrade software on those guests.
 
 **Part1: Deploy vCMP guests**
+
 The BIG-IP image is downloaded and accessible in a directory (/root/images) local from where the ansible playbook is being run 
 
 **Example playbooks: vcmp_host_mgmt.yml**
+
 Deploy 1 vCMP guest
 
 ```
@@ -55,6 +57,7 @@ The code above deploys 1 vCMP guest. If you have multiple vCMP guests that need 
 - Using a loop within the task itself - Let's take a look at this option
 
 **Example playbook: vcmp_host_mgmt.yml**
+
 Deploy mulitple vCMP guests using a variable file
 
 ```
