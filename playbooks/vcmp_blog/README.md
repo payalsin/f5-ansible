@@ -4,6 +4,8 @@ I am going to start with a definition of vCMP since many use it but don’t know
 
 With managing multiple instances on a single platform there is almost certainly repetitiveness of tasks that are performed. The vCMP platform is no exception. The vCMP host can consist of multiple slots and multiple guests can be distributed among those slots. There are different ways to provision vCMP guests on a host depending on the hardware specifications of the host. I wont go into details here but [click here for great resource to guide you on vCMP guest distribution on vCMP hosts](https://support.f5.com/csp/article/K14727).
 
+While there is a inclination to use a software only solution, F5 BIG-IP vCMP can be a great solution since it provides the performance and relaibility you can get from hardware along with an added layer of virtulization. [Learn more about the benefits and comparisions of vCMP over other solutions](https://www.f5.com/services/resources/white-papers/virtual-clustered-multiprocessing-vcmp)
+
 In this article I am going to talk about how you can use Ansible to deploy vCMP guests and also talk about how you can upgrade software on those guests.
 
 **Part1: Deploy vCMP guests**
@@ -53,10 +55,81 @@ Deploy 1 vCMP guest
 ```
 
 The code above deploys 1 vCMP guest. If you have multiple vCMP guests that need to be deployed there are a number of ways to do that:
-- A variable file can be used to store information on each vCMP guest and then referenced within the playbook
-- Using a loop within the task itself - **Let's take a look at this option**
+- Variable file: A variable file can be used to store information on each vCMP guest and then referenced within the playbook
+- Loops: Using a loop within the task itself 
 
-**Example playbook: vcmp_host_mgmt.yml**
+Let's take a look at each option
+
+Variable file: Deploy mulitple vCMP guests using the async operation and a variable file
+
+**Example variable file: variable_file.yml**
+
+```
+vcmp_guests:
+- name: "vCMP85"
+  ip: "10.192.73.85"
+- name: "vCMP86"
+  ip: "10.192.73.86"
+```
+
+**Example playbook variable file: vcmp_host_mgmt_var.yml**
+
+```
+- name: vCMP MGMT
+  hosts: localhost
+  connection: local
+
+  vars:
+   image: "BIGIP-14.1.2-0.0.37.iso"
+
+  vars_files:
+  - variable_file.yml
+
+  tasks:
+  - name: Setup provider
+    set_fact:
+     vcmp_host_creds:
+      server: "10.192.xx.xx"
+      user: "admin"
+      password: "admin"
+      server_port: "443"
+      validate_certs: "no"
+
+  - name: Upload software on vCMP Host
+    bigip_software_image:
+      image: "/root/images/{{image}}"
+      provider: "{{vcmp_host_creds}}"
+
+  - name: Create vCMP guest
+    bigip_vcmp_guest:
+      name: "{{item.name}}"
+      initial_image: "{{image}}"
+      mgmt_network: bridged
+      mgmt_address: "{{item.ip}}/24"
+      mgmt_route: 10.192.73.1
+      cores_per_slot: 1
+      state: present
+      provider: "{{vcmp_host_creds}}"
+    with_items: "{{vcmp_guests}}"
+    register: _create_vcmp_instances
+    # This will run the tasks in parallel and spin the vCMP guests simultaneously
+    async: 900
+    poll: 0
+
+  - name: Wait for creation to finish
+    async_status:
+      jid: "{{ item.ansible_job_id }}"
+    register: _jobs
+    until: _jobs.finished
+    delay: 10  # Check every 10 seconds. Adjust as you like.
+    retries: 85  # Retry up to 10 times. Adjust as needed.
+    with_items: "{{ _create_vcmp_instances.results }}"
+```
+Click here to learn more about the [async](https://blog.crisp.se/2018/01/27/maxwenzin/how-to-run-ansible-tasks-in-parallel) and [async_status module](https://docs.ansible.com/ansible/latest/user_guide/playbooks_async.html)
+
+Next let's look at an example of using loops
+
+**Example playbook loops: vcmp_host_mgmt_loops.yml**
 
 Deploy mulitple vCMP guests using the async operation
 
@@ -98,7 +171,7 @@ Deploy mulitple vCMP guests using the async operation
       provider: "{{vcmp_host_creds}}"
     with_items: 
     - { name: 'vCMP85', ip: '10.192.73.85' }
-    - { name: 'vcMP86', ip: '10.192.73.86' }
+    - { name: 'vCMP86', ip: '10.192.73.86' }
     register: _create_vcmp_instances
     # This will run the tasks in parallel and spin the vCMP guests simultaneously
     async: 900
@@ -114,7 +187,6 @@ Deploy mulitple vCMP guests using the async operation
     with_items: "{{ _create_vcmp_instances.results }}"
 
  ```
-Click here to learn more about the [async](https://blog.crisp.se/2018/01/27/maxwenzin/how-to-run-ansible-tasks-in-parallel) and [async_status module](https://docs.ansible.com/ansible/latest/user_guide/playbooks_async.html)
 
 **Part2: Software upgrade**
 
