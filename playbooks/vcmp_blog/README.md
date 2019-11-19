@@ -2,7 +2,7 @@
 
 I am going to start with a definition of vCMP since many use it but don’t know what it stands for: **Virtual Clustered Multiprocessing™ (vCMP®)** is a feature of the BIG-IP® system that allows you to provision and manage multiple, hosted instances of the BIG-IP software on a single hardware platform.
 
-With managing multiple instances on a single platform there is almost certainly repetitiveness of tasks that are performed. The vCMP platform is no exception. The vCMP host can consist of multiple slots and multiple guests can be distributed among those slots. There are different ways to provision vCMP guests on a host depending on the hardware specifications of the host. I wont go into details here but [click here for great resource to guide you on vCMP guest distribution on vCMP hosts].(https://support.f5.com/csp/article/K14727)
+With managing multiple instances on a single platform there is almost certainly repetitiveness of tasks that are performed. The vCMP platform is no exception. The vCMP host can consist of multiple slots and multiple guests can be distributed among those slots. There are different ways to provision vCMP guests on a host depending on the hardware specifications of the host. I wont go into details here but [click here for great resource to guide you on vCMP guest distribution on vCMP hosts](https://support.f5.com/csp/article/K14727).
 
 In this article I am going to talk about how you can use Ansible to deploy vCMP guests and also talk about how you can upgrade software on those guests.
 
