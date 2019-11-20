@@ -54,7 +54,15 @@ Deploy 1 vCMP guest
       provider: "{{vcmp_host_creds}}"
 ```
 
-The code above deploys 1 vCMP guest. If you have multiple vCMP guests that need to be deployed there are a number of ways to do that:
+Compelete list of parameters that used for the module above: https://docs.ansible.com/ansible/latest/modules/bigip_vcmp_guest_module.html
+
+**Few pointers:**
+- The vCMP guest when created can be set to any initial BIG-IP image that is present on the vCMP host (that could be the image and version of the vCMP host itself)
+- If VLAN's need to be assigned to the vCMP guest at the time of creation those VLAN's need to be added to the host beforehand
+- Different cores and slots can be assigned to the vCMP guest
+- Managment network can be set to bridged or isolated 
+
+Now the code above deploys 1 vCMP guest. If you have multiple vCMP guests that need to be deployed there are a number of ways to do that:
 - Variable file: A variable file can be used to store information on each vCMP guest and then referenced within the playbook
 - Loops: Using a loop within the task itself 
 
