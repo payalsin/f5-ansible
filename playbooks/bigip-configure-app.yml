@@ -4,9 +4,6 @@
   connection: local
   gather_facts: false
 
-  collections:
-  - f5networks.f5_modules
-
   tasks:
     - name: Setup provider
       set_fact:
