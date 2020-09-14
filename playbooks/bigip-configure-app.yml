@@ -8,7 +8,7 @@
     - name: Setup provider
       set_fact:
         provider:
-          server: "{{private_ip}}"
+          server: "{{ansible_host}}"
           user: "{{ansible_user}}"
           password: "{{ansible_ssh_pass}}"
           server_port: "8443"
