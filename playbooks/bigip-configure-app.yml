@@ -24,7 +24,7 @@
     - name: CREATE POOL
       bigip_pool:
         provider: "{{provider}}"
-        name: "http_pool"
+        name: "{{pool_name}}"
         lb_method: "round-robin"
         monitors: "/Common/http"
         monitor_type: "and_list"
