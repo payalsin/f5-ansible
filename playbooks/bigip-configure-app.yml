@@ -17,7 +17,6 @@
     - name: CREATE NODES
       bigip_node:
         provider: "{{provider}}"
-        #host: "{{hostvars[item].ansible_host}}"
         host: "{{hostvars[item].private_ip}}"
         name: "{{hostvars[item].inventory_hostname}}"
       loop: "{{ groups['web'] }}"
@@ -48,7 +47,7 @@
         port: "443"
         enabled_vlans: "all"
         all_profiles: ['http', 'clientssl', 'oneconnect']
-        pool: "http_pool"
+        pool: "{{pool_name}}"
         snat: "Automap"
 
     - name: SAVE RUNNING CONFIGURATION
