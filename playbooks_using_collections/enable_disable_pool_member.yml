@@ -1,0 +1,80 @@
+---
+- name: "Enabling/disabling a pool member"
+  hosts: lb
+  gather_facts: false
+  connection: local
+
+  collections:
+   - f5networks.f5_modules
+
+#  vars:
+#    - pool_name: "http_pool"
+#    - member_name: "node1:80"
+#    - operation: "enable"
+
+  tasks:
+    - name: Setup provider
+      set_fact:
+        provider:
+          server: "{{private_ip}}"
+          server_port: 8443
+          validate_certs: false
+
+    - name: Query BIG-IP facts
+      bigip_device_info:
+        provider: "{{provider}}"
+        gather_subset:
+          - ltm-pools
+      register: bigip_facts
+
+    - name: "Show members belonging to pool {{pool_name}}"
+      debug: "msg={{item}}"
+      loop: "{{bigip_facts.ltm_pools | json_query(query_string)}}"
+      vars:
+        query_string: "[?name=='{{pool_name}}'].members[*].name[]"
+
+    - name: Disable ALL pool members
+      bigip_pool_member:
+        provider: "{{provider}}"
+        state: "forced_offline"
+        name: "{{item.split(':')[0]}}"
+        pool: "{{pool_name}}"
+        port: "{{item.split(':')[1]}}"
+        host: "{{hostvars[item.split(':')[0]].ansible_host}}"
+      loop: "{{bigip_facts.ltm_pools | json_query(query_string)}}"
+      vars:
+        query_string: "[?name=='{{pool_name}}'].members[*].name[]"
+      when: '"all" in member_name and "disable" in operation'
+
+    - name: Disable pool member {{member_name}}
+      bigip_pool_member:
+        provider: "{{provider}}"
+        state: "forced_offline"
+        name: "{{member_name.split(':')[0]}}"
+        pool: "{{pool_name}}"
+        port: "{{member_name.split(':')[1]}}"
+        host: "{{hostvars[member_name.split(':')[0]].ansible_host}}"
+      when: '"all" not in member_name and "disable" in operation'
+
+    - name: Enable ALL pool members
+      bigip_pool_member:
+        provider: "{{provider}}"
+        state: "enabled"
+        name: "{{item.split(':')[0]}}"
+        pool: "{{pool_name}}"
+        port: "{{item.split(':')[1]}}"
+        host: "{{hostvars[item.split(':')[0]].ansible_host}}"
+      loop: "{{bigip_facts.ltm_pools | json_query(query_string)}}"
+      vars:
+        query_string: "[?name=='{{pool_name}}'].members[*].name[]"
+      when: '"all" in member_name and "enable" in operation'
+
+    - name: Enable pool member {{member_name}}
+      bigip_pool_member:
+        provider: "{{provider}}"
+        state: "enabled"
+        name: "{{member_name.split(':')[0]}}"
+        pool: "{{pool_name}}"
+        port: "{{member_name.split(':')[1]}}"
+        host: "{{hostvars[member_name.split(':')[0]].ansible_host}}"
+      when: '"all" not in member_name and "enable" in operation'
